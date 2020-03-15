@@ -6,6 +6,7 @@ from setuptools import Extension
 
 logger = logging.getLogger(__name__)
 
+SEP_LEN = len(os.path.sep)
 
 class Multibuild:
     def __init__(self, extension_name: str, files: tp.Iterable[str]):
@@ -152,10 +153,10 @@ def bootstrap_cython_submodules():
             data = ''
 
         if 'bootstrap_cython_submodules' not in data:
-            data = data + """
+            data = ("""
 from %s.__bootstrap__ import bootstrap_cython_submodules
 bootstrap_cython_submodules()
-""" % (self.extension_name, )
+""" % (self.extension_name, )) + data
 
         with open(os.path.join(self.bootstrap_directory, '__init__.py'), 'w') as f_out:
             f_out.write(data)
