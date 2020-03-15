@@ -21,6 +21,11 @@ setup(name='example_module',
             'Cython'
       ],
       zip_safe=False,
+      tests_require=[
+          "nose2"
+      ],
+      test_suite='nose2.collector.collector',
+      python_requires='!=2.7.*,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*',
       ext_modules=ext_modules
 )
 
