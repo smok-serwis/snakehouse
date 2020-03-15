@@ -5,7 +5,8 @@ from cython_multibuild import Multibuild
 
 
 cython_multibuilds = [
-    Multibuild('example_module', ['example_module/test.pyx', 'example_module/test2.pyx'])
+    Multibuild('example_module', ['example_module/test.pyx', 'example_module/test2.pyx',
+                                  'example_module/test3/test3.pyx'])
 ]
 
 ext_modules = Build.cythonize(cython_multibuilds,
