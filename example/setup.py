@@ -18,7 +18,7 @@ setup(name='example_module',
       version='0.1',
       packages=find_packages(include=['example_module']),
       install_requires=[
-            'Cython'
+            'Cython', 'cython-multibuild'
       ],
       zip_safe=False,
       tests_require=[
