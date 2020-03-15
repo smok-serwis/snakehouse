@@ -62,7 +62,8 @@ cdef extern from "Python.h":
 """]
         for filename in self.files:
             path, name = os.path.split(filename)
-            path = path.replace(self.bootstrap_directory, '')
+            if path.startswith(self.bootstrap_directory):
+                path = path[len(self.bootstrap_directory):]
             module_name = name.replace('.pyx', '')
             if path:
                 h_path_name = os.path.join(path[1:], name.replace('.pyx', '.h')).replace('\\', '\\\\')
@@ -70,8 +71,6 @@ cdef extern from "Python.h":
                 h_path_name = name.replace('.pyx', '.h')
             bootstrap_contents.append('cdef extern from "%s":\n' % (h_path_name, ))
             bootstrap_contents.append('    object PyInit_%s()\n\n' % (module_name, ))
-
-            module_py_name = '.'.join([self.extension_name] + h_path_name.split(os.path.sep))
 
             if path:
                 complete_module_name = self.extension_name+'.'+'.'.join(path[1:].split(os.path.sep))+'.'+module_name
