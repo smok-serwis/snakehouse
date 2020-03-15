@@ -1,5 +1,6 @@
 cython-multibuild
 =================
+[![Build Status](https://travis-ci.org/smok-serwis/cython-multibuild.svg)](https://travis-ci.org/smok-serwis/cython-multibuild)
 [![PyPI](https://img.shields.io/pypi/pyversions/cython-multibuild.svg)](https://pypi.python.org/pypi/cython-multibuild)
 [![PyPI version](https://badge.fury.io/py/cython-multibuild.svg)](https://badge.fury.io/py/cython-multibuild)
 [![PyPI](https://img.shields.io/pypi/implementation/cython-multibuild.svg)](https://pypi.python.org/pypi/cython-multibuild)
