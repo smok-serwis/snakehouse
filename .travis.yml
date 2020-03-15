@@ -7,4 +7,5 @@ script:
  - cd example
  - python setup.py test
 install:
+ - pip install Cython
  - python setup.py install
