@@ -44,7 +44,7 @@ class Multibuild:
                 with open(os.path.join(path, h_name), 'w') as f_out:
                     f_out.write(data)
             else:
-                with open(os.path.join(path, name.replace('.pyx', '.h')), 'w') as f_out:
+                with open(os.path.join(path, h_name), 'w') as f_out:
                     f_out.write('#include "Python.h"\n')
                     f_out.write('\n'+exported_line+'\n')
 
@@ -64,7 +64,7 @@ cdef extern from "Python.h":
             path = path.replace(self.bootstrap_directory, '')
             module_name = name.replace('.pyx', '')
             if path:
-                h_path_name = os.path.join(path, name.replace('.pyx', '.h'))
+                h_path_name = os.path.join(path[1:], name.replace('.pyx', '.h')).replace('\\', '\\\\')
             else:
                 h_path_name = name.replace('.pyx', '.h')
             bootstrap_contents.append('cdef extern from "%s":\n' % (h_path_name, ))
@@ -72,7 +72,12 @@ cdef extern from "Python.h":
 
             module_py_name = '.'.join([self.extension_name] + h_path_name.split(os.path.sep))
 
-            self.modules.add((self.extension_name+'.'+module_name, 'PyInit_%s()' % (module_name, )))
+            if path:
+                complete_module_name = self.extension_name+'.'+'.'.join(path[1:].split(os.path.sep))+'.'+module_name
+            else:
+                complete_module_name = self.extension_name + '.'+module_name
+
+            self.modules.add((complete_module_name, 'PyInit_%s()' % (module_name, )))
 
         bootstrap_contents.append('''cdef object get_definition_by_name(str name):\n''')
         modules = iter(self.modules)
