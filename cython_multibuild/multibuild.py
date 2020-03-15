@@ -12,7 +12,6 @@ class Multibuild:
     def __init__(self, extension_name: str, files: tp.Iterable[str]):
         self.files = list([file for file in files if not file.endswith('__bootstrap__.pyx')])
         file_name_set = set(os.path.split(file)[1] for file in self.files)
-        print(self.files)
         if len(self.files) != len(file_name_set):
             raise ValueError('Two modules with the same name cannot appear together in a single '
                              'Multibuild')
@@ -111,11 +110,9 @@ cdef class CythonPackageLoader:
     def create_module(self, spec):
         if spec.name != self.name:
             raise ImportError()
-        print('Before FromDefAndSpec')
         return PyModule_FromDefAndSpec(self.definition, spec)
 
     def exec_module(self, module):
-        print('Before execmodule')
         PyModule_ExecDef(module, self.definition)
 
 
@@ -140,7 +137,6 @@ def bootstrap_cython_submodules():
         return ''.join(bootstrap_contents)
 
     def write_bootstrap_file(self):
-        print('Writing to ', os.path.join(self.bootstrap_directory, '__bootstrap__.pyx'))
         with open(os.path.join(self.bootstrap_directory, '__bootstrap__.pyx'), 'w') as f_out:
             f_out.write(self.generate_bootstrap())
 
