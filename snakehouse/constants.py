@@ -66,7 +66,7 @@ bootstrap_cython_submodules()
 BOOTSTRAP_PYX_CDEF = """
 cdef extern from "%s":
     object PyInit_%s()    
-'"""
+"""
 
 BOOTSTRAP_PYX_GET_DEFINITION_HEADER = """
 cdef object get_definition_by_name(str name):
