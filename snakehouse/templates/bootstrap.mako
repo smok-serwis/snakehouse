@@ -6,10 +6,21 @@ cdef extern from "Python.h":
     object PyModule_FromDefAndSpec(PyModuleDef *definition, object spec)
     int PyModule_ExecDef(object module, PyModuleDef* definition)
 
-{cdef_section}
+% for cdef_section in cdef_sections:
+cdef extern from "${cdef_section.h_file_name}":
+    object PyInit_${cdef_section.module_name}()
+% endfor
 
 cdef object get_definition_by_name(str name):
-{get_definition_section}
+% for i, getdef_section in enumerate(get_definition_sections):
+% if i == 0:
+    if name == "${getdef_section.module_name}":
+        return PyInit_${getdef_section.pyinit_name}()
+% else:
+    elif name == "${getdef_section.module_name}":
+        return PyInit_${getdef_section.pyinit_name}()
+% endif
+% endfor
 
 import sys
 
@@ -49,5 +60,5 @@ class CythonPackageMetaPathFinder:
         pass
 
 def bootstrap_cython_submodules():
-    modules_set = {module_set}
+    modules_set = ${module_set}
     sys.meta_path.append(CythonPackageMetaPathFinder(modules_set))
