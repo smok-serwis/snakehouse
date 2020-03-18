@@ -1,8 +1,11 @@
 language: python
 python:
+ - "3.5"
+ - "3.6"
  - "3.7"
  - "3.8"
  - "nightly"
+ - "pypy3.5"
 cache: pip
 script:
  - cd example
