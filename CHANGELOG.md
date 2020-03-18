@@ -1,3 +1,7 @@
+# v1.0.3
+
+* _TBA_
+
 # v1.0.2
 
 * got rid of some C compiler warnings
