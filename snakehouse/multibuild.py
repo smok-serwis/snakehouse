@@ -1,12 +1,8 @@
-import logging
 import typing as tp
 import os
 
 from setuptools import Extension
 
-logger = logging.getLogger(__name__)
-
-SEP_LEN = len(os.path.sep)
 
 class Multibuild:
     def __init__(self, extension_name: str, files: tp.Iterable[str]):
