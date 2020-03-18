@@ -1,4 +1,4 @@
-cdef extern from "test_n.h"
+cdef extern from "test_n.h":
     float _times_five(float)
 
 
