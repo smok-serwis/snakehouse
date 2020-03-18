@@ -10,8 +10,9 @@ into a single extension.
 
 Inspired by [this StackOverflow discussion](https://stackoverflow.com/questions/30157363/collapse-multiple-submodules-to-one-cython-extension).
 
-Tested and works on CPython 3.8 and CPython 3.7, 
+Tested and works on CPython 3.5-3.9, 
 both Windows and [Linux](https://travis-ci.org/github/smok-serwis/snakehouse).
+It doesn't work on PyPy.
 
 Contributions most welcome! If you contribute, feel free to attach
 a change to [CONTRIBUTORS.md](/CONTRIBUTORS.md) as 
