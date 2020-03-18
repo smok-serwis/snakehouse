@@ -72,7 +72,7 @@ BOOTSTRAP_PYX_GET_DEFINITION_HEADER = """
 cdef object get_definition_by_name(str name):
 """
 
-BOOTSTRAP_PYX_GET_DEFINITION_IF = """   if name == %s:
+BOOTSTRAP_PYX_GET_DEFINITION_IF = """    if name == %s:
         return %s
 """
 

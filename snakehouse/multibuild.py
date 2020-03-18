@@ -7,6 +7,9 @@ from .constants import BOOTSTRAP_PYX_HEADER, BOOTSTRAP_PYX_PACKAGE_LOADER, INIT_
 
 
 class Multibuild:
+    """
+    This specifies a single Cython extension, called {extension_name}.__bootstrap__
+    """
     def __init__(self, extension_name: str, files):
         """
         :param extension_name: the module name
@@ -18,20 +21,19 @@ class Multibuild:
             raise ValueError('Two modules with the same name cannot appear together in a single '
                              'Multibuild')
 
-        self.sane_files = [file for file in files if file.endswith('.pyx')]
+        self.pyx_files = [file for file in files if file.endswith('.pyx')]
 
         self.extension_name = extension_name
         self.bootstrap_directory = os.path.commonpath(self.files)
         self.modules = set()    # tp.Set[tp.Tuple[str, str]]
 
     def generate_header_files(self):
-        for filename in self.sane_files:
+        for filename in self.pyx_files:
             path, name = os.path.split(filename)
             if not name.endswith('.pyx'):
                 continue
 
             module_name = name.replace('.pyx', '')
-
             h_name = name.replace('.pyx', '.h')
             exported_line = INCLUDE_PYINIT % (module_name,)
 
@@ -44,17 +46,15 @@ class Multibuild:
 
                 if exported_line not in data:
                     data = data+'\n'+exported_line+'\n'
-
-                with open(os.path.join(path, h_name), 'w') as f_out:
-                    f_out.write(data)
             else:
-                with open(os.path.join(path, h_name), 'w') as f_out:
-                    f_out.write(INCLUDE_PYTHON_H)
-                    f_out.write('\n'+exported_line+'\n')
+                data = INCLUDE_PYTHON_H+'\n'+exported_line+'\n'
+
+            with open(os.path.join(path, h_name), 'w') as f_out:
+                f_out.write(data)
 
     def generate_bootstrap(self) -> str:
         bootstrap_contents = [BOOTSTRAP_PYX_HEADER]
-        for filename in self.sane_files:
+        for filename in self.pyx_files:
             path, name = os.path.split(filename)
             if path.startswith(self.bootstrap_directory):
                 path = path[len(self.bootstrap_directory):]
