@@ -8,7 +8,7 @@ snakehouse
 snakehouse is a tool to pack mutiple .pyx files
 into a single extension.
 
-Inspired by [https://stackoverflow.com/questions/30157363/collapse-multiple-submodules-to-one-cython-extension](this StackOverflow discussion).
+Inspired by [this StackOverflow discussion](https://stackoverflow.com/questions/30157363/collapse-multiple-submodules-to-one-cython-extension).
 
 Tested and works on Python 3.8 and Python 3.7, 
 both Windows and Linux.
@@ -20,5 +20,5 @@ Take a look at [example](example/) on how to multi-build your Cython extensions.
 Limitations
 -----------
 
-* Two modules with the same name cannot be mentioned in a single Multibuild.
+* Two modules with the same name cannot be mentioned in a single Multibuild (issue #1).
 
