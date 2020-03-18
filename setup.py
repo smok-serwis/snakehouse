@@ -9,4 +9,8 @@ setup(keywords=['cython', 'extension', 'multiple', 'pyx'],
             'Cython'
       ],
       python_requires='!=2.7.*,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*',
+      package_data={
+            'snakehouse': ['*.template']
+      },
+      package_dir={'snakehouse': 'snakehouse'},
       )
