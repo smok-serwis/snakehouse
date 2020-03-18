@@ -66,14 +66,16 @@ cdef extern from "Python.h":
                 path = path[len(self.bootstrap_directory):]
             module_name = name.replace('.pyx', '')
             if path:
-                h_path_name = os.path.join(path[1:], name.replace('.pyx', '.h')).replace('\\', '\\\\')
+                h_path_name = os.path.join(path[1:], name.replace('.pyx', '.h')).\
+                    replace('\\', '\\\\')
             else:
                 h_path_name = name.replace('.pyx', '.h')
             bootstrap_contents.append('cdef extern from "%s":\n' % (h_path_name, ))
             bootstrap_contents.append('    object PyInit_%s()\n\n' % (module_name, ))
 
             if path:
-                complete_module_name = self.extension_name+'.'+'.'.join(path[1:].split(os.path.sep))+'.'+module_name
+                complete_module_name = self.extension_name+'.'+'.'.join(path[1:].split(
+                    os.path.sep))+'.'+module_name
             else:
                 complete_module_name = self.extension_name + '.'+module_name
 
@@ -164,6 +166,7 @@ bootstrap_cython_submodules()
 
     def for_cythonize(self, *args, **kwargs):
         return Extension(self.extension_name+".__bootstrap__",
-                         self.files + [os.path.join(self.bootstrap_directory, '__bootstrap__.pyx')],
+                         self.files + [os.path.join(self.bootstrap_directory,
+                                                    '__bootstrap__.pyx')],
                          *args,
                          **kwargs)
