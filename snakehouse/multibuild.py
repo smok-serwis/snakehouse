@@ -3,7 +3,7 @@ import os
 from setuptools import Extension
 from .constants import BOOTSTRAP_PYX_HEADER, BOOTSTRAP_PYX_PACKAGE_LOADER, INIT_PY_CONTENTS, \
     BOOTSTRAP_PYX_CDEF, BOOTSTRAP_PYX_GET_DEFINITION_HEADER, BOOTSTRAP_PYX_GET_DEFINITION_IF, \
-    BOOTSTRAP_PYX_GET_DEFINITION_ELIF
+    BOOTSTRAP_PYX_GET_DEFINITION_ELIF, INCLUDE_PYTHON_H, INCLUDE_PYINIT
 
 
 class Multibuild:
@@ -33,14 +33,14 @@ class Multibuild:
             module_name = name.replace('.pyx', '')
 
             h_name = name.replace('.pyx', '.h')
-            exported_line = 'PyObject* PyInit_%s();' % (module_name,)
+            exported_line = INCLUDE_PYINIT % (module_name,)
 
             if os.path.exists(h_name):
                 with open(os.path.join(path, h_name), 'r') as f_in:
                     data = f_in.read()
 
-                if '#include "Python.h"' not in data:
-                    data = '#include "Python.h"\n'+data
+                if INCLUDE_PYTHON_H not in data:
+                    data = INCLUDE_PYTHON_H+data
 
                 if exported_line not in data:
                     data = data+'\n'+exported_line+'\n'
@@ -49,7 +49,7 @@ class Multibuild:
                     f_out.write(data)
             else:
                 with open(os.path.join(path, h_name), 'w') as f_out:
-                    f_out.write('#include "Python.h"\n')
+                    f_out.write(INCLUDE_PYTHON_H)
                     f_out.write('\n'+exported_line+'\n')
 
     def generate_bootstrap(self) -> str:
