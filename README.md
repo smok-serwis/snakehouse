@@ -1,4 +1,4 @@
-snakehouse
+snakehouse~~~~
 ==========
 [![Build Status](https://travis-ci.org/smok-serwis/snakehouse.svg)](https://travis-ci.org/smok-serwis/snakehouse)
 [![PyPI](https://img.shields.io/pypi/pyversions/snakehouse.svg)](https://pypi.python.org/pypi/snakehouse)
@@ -11,7 +11,11 @@ into a single extension.
 Inspired by [this StackOverflow discussion](https://stackoverflow.com/questions/30157363/collapse-multiple-submodules-to-one-cython-extension).
 
 Tested and works on CPython 3.8 and CPython 3.7, 
-both Windows and Linux.
+both Windows and [Linux](https://travis-ci.org/github/smok-serwis/snakehouse).
+
+Contributions most welcome! If you contribute, feel free to attach
+a change to [CONTRIBUTORS.md](/CONTRIBUTORS.md) as 
+a part of your pull request as well!
 
 Usage
 -----
