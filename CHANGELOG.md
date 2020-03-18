@@ -1,6 +1,7 @@
 # v1.0.2
 
-* _TBA_
+* got rid of some C compiler warnings
+* module will now use mako to render the files
 
 # v1.0.1
 
