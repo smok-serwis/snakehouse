@@ -3,9 +3,6 @@ import collections
 import pkg_resources
 from mako.template import Template
 from setuptools import Extension
-from .constants import BOOTSTRAP_PYX_GET_DEFINITION_IF, \
-    BOOTSTRAP_PYX_GET_DEFINITION_ELIF, INCLUDE_PYTHON_H, INCLUDE_PYINIT
-
 
 CdefSection = collections.namedtuple('CdefSection', ('h_file_name', 'module_name'))
 GetDefinitionSection = collections.namedtuple('GetDefinitionSection', (
@@ -14,7 +11,8 @@ GetDefinitionSection = collections.namedtuple('GetDefinitionSection', (
 
 
 def render_mako(template_name: str, **kwargs) -> str:
-    tpl = Template(pkg_resources.resource_string('snakehouse', template_name).decode('utf8'))
+    tpl = Template(pkg_resources.resource_string(
+        'snakehouse', os.path.join('templates', template_name)).decode('utf8'))
     return tpl.render(**kwargs)
 
 
