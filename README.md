@@ -4,6 +4,8 @@ snakehouse
 [![PyPI](https://img.shields.io/pypi/pyversions/snakehouse.svg)](https://pypi.python.org/pypi/snakehouse)
 [![PyPI version](https://badge.fury.io/py/snakehouse.svg)](https://badge.fury.io/py/snakehouse)
 [![PyPI](https://img.shields.io/pypi/implementation/snakehouse.svg)](https://pypi.python.org/pypi/snakehouse)
+[![PyPI](https://img.shields.io/pypi/wheel/snakehouse.svg)]()
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 
 snakehouse is a tool to pack mutiple .pyx files
 into a single extension.
