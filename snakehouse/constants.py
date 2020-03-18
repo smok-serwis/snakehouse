@@ -4,8 +4,7 @@ import typing as tp
 logger = logging.getLogger(__name__)
 
 
-BOOTSTRAP_PYX_GET_DEFINITION_IF = """    if name == %s:
-        return %s
+BOOTSTRAP_PYX_GET_DEFINITION_IF = """
 """
 
 BOOTSTRAP_PYX_GET_DEFINITION_ELIF = """    elif name == %s:

@@ -1,9 +1,16 @@
 import os
+import collections
 import pkg_resources
+from mako.template import Template
 from setuptools import Extension
 from .constants import BOOTSTRAP_PYX_GET_DEFINITION_IF, \
     BOOTSTRAP_PYX_GET_DEFINITION_ELIF, INCLUDE_PYTHON_H, INCLUDE_PYINIT
 
+
+CdefSection = collections.namedtuple('CdefSection', ('h_file_name', 'module_name'))
+GetDefinitionSection = collections.namedtuple('GetDefinitionSection', (
+    'module_name', 'pyinit_name'
+))
 
 class Multibuild:
     """
@@ -65,7 +72,7 @@ class Multibuild:
             else:
                 h_path_name = name.replace('.pyx', '.h')
             cdef_template = pkg_resources.resource_string('snakehouse', 'cdef.template').decode('utf8')
-            cdef_section.append(cdef_template % (h_path_name, module_name))
+            cdef_section.append(CdefSection(h_path_name, module_name))
 
             if path:
                 complete_module_name = self.extension_name+'.'+'.'.join(path[1:].split(
@@ -73,19 +80,18 @@ class Multibuild:
             else:
                 complete_module_name = self.extension_name + '.'+module_name
 
-            self.modules.add((complete_module_name, 'PyInit_%s()' % (module_name, )))
+            self.modules.add((complete_module_name, module_name, ))
 
         get_definition = []
         modules = iter(self.modules)
         mod_name, init_fun_name = next(modules)
         get_definition.append(BOOTSTRAP_PYX_GET_DEFINITION_IF % (repr(mod_name), init_fun_name))
         for mod_name, init_fun_name in modules:
-            get_definition.append(BOOTSTRAP_PYX_GET_DEFINITION_ELIF % (
-                repr(mod_name), init_fun_name))
+            get_definition.append(GetDefinitionSection(mod_name, init_fun_name))
 
-        return bootstrap_contents.format(cdef_section=''.join(cdef_section),
-                                         get_definition_section=''.join(get_definition),
-                                         module_set=repr(set(x[0] for x in self.modules)))
+        return Template(bootstrap_contents).render(cdef_sections=cdef_section,
+                                                   get_definition_sections=get_definition,
+                                                   module_set=repr(set(x[0] for x in self.modules)))
 
     def write_bootstrap_file(self):
         with open(os.path.join(self.bootstrap_directory, '__bootstrap__.pyx'), 'w') as f_out:
