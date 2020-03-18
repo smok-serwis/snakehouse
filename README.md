@@ -1,6 +1,8 @@
 snakehouse
 ==========
 [![Build Status](https://travis-ci.org/smok-serwis/snakehouse.svg)](https://travis-ci.org/smok-serwis/snakehouse)
+[![Code Climate](https://codeclimate.com/github/smok-serwis/snakehouse/badges/gpa.svg)](https://codeclimate.com/github/smok-serwis/snakehouse)
+[![Issue Count](https://codeclimate.com/github/smok-serwis/snakehouse/badges/issue_count.svg)](https://codeclimate.com/github/smok-serwis/snakehouse)
 [![PyPI](https://img.shields.io/pypi/pyversions/snakehouse.svg)](https://pypi.python.org/pypi/snakehouse)
 [![PyPI version](https://badge.fury.io/py/snakehouse.svg)](https://badge.fury.io/py/snakehouse)
 [![PyPI](https://img.shields.io/pypi/implementation/snakehouse.svg)](https://pypi.python.org/pypi/snakehouse)
