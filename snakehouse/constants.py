@@ -3,10 +3,6 @@ import typing as tp
 
 logger = logging.getLogger(__name__)
 
-BOOTSTRAP_PYX_CDEF = """
-cdef extern from "%s":
-    object PyInit_%s()    
-"""
 
 BOOTSTRAP_PYX_GET_DEFINITION_IF = """    if name == %s:
         return %s

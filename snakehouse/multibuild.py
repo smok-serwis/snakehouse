@@ -1,7 +1,7 @@
 import os
 import pkg_resources
 from setuptools import Extension
-from .constants import BOOTSTRAP_PYX_CDEF, BOOTSTRAP_PYX_GET_DEFINITION_IF, \
+from .constants import BOOTSTRAP_PYX_GET_DEFINITION_IF, \
     BOOTSTRAP_PYX_GET_DEFINITION_ELIF, INCLUDE_PYTHON_H, INCLUDE_PYINIT
 
 
@@ -52,7 +52,7 @@ class Multibuild:
                 f_out.write(data)
 
     def generate_bootstrap(self) -> str:
-        bootstrap_contents = pkg_resources.resource_string('snakehouse', 'bootstrap.template')
+        bootstrap_contents = pkg_resources.resource_string('snakehouse', 'bootstrap.template').decode('utf8')
         cdef_section = []
         for filename in self.pyx_files:
             path, name = os.path.split(filename)
@@ -64,7 +64,8 @@ class Multibuild:
                     replace('\\', '\\\\')
             else:
                 h_path_name = name.replace('.pyx', '.h')
-            cdef_section.append(BOOTSTRAP_PYX_CDEF % (h_path_name, module_name))
+            cdef_template = pkg_resources.resource_string('snakehouse', 'cdef.template').decode('utf8')
+            cdef_section.append(cdef_template % (h_path_name, module_name))
 
             if path:
                 complete_module_name = self.extension_name+'.'+'.'.join(path[1:].split(
@@ -91,7 +92,7 @@ class Multibuild:
             f_out.write(self.generate_bootstrap())
 
     def alter_init(self):
-        pyinit_contents = pkg_resources.resource_string('snakehouse', 'initpy.template')
+        pyinit_contents = pkg_resources.resource_string('snakehouse', 'initpy.template').decode('utf8')
 
         if os.path.exists(os.path.join(self.bootstrap_directory, '__init__.py')):
             with open(os.path.join(self.bootstrap_directory, '__init__.py'), 'r') as f_in:
