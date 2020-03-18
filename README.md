@@ -16,6 +16,8 @@ both Windows and [Linux](https://travis-ci.org/github/smok-serwis/snakehouse).
 Contributions most welcome! If you contribute, feel free to attach
 a change to [CONTRIBUTORS.md](/CONTRIBUTORS.md) as 
 a part of your pull request as well!
+Note what have you changed in
+[CHANGELOG.md](/CHANGELOG.md) as well!
 
 Usage
 -----
