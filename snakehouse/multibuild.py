@@ -1,8 +1,7 @@
 import os
-
+import pkg_resources
 from setuptools import Extension
-from .constants import BOOTSTRAP_PYX_HEADER, BOOTSTRAP_PYX_PACKAGE_LOADER, INIT_PY_CONTENTS, \
-    BOOTSTRAP_PYX_CDEF, BOOTSTRAP_PYX_GET_DEFINITION_HEADER, BOOTSTRAP_PYX_GET_DEFINITION_IF, \
+from .constants import BOOTSTRAP_PYX_GET_DEFINITION_IF, \
     BOOTSTRAP_PYX_GET_DEFINITION_ELIF, INCLUDE_PYTHON_H, INCLUDE_PYINIT
 
 
@@ -53,7 +52,8 @@ class Multibuild:
                 f_out.write(data)
 
     def generate_bootstrap(self) -> str:
-        bootstrap_contents = [BOOTSTRAP_PYX_HEADER]
+        bootstrap_contents = pkg_resources.resource_string('snakehouse', 'bootstrap.template').decode('utf8')
+        cdef_section = []
         for filename in self.pyx_files:
             path, name = os.path.split(filename)
             if path.startswith(self.bootstrap_directory):
@@ -64,7 +64,8 @@ class Multibuild:
                     replace('\\', '\\\\')
             else:
                 h_path_name = name.replace('.pyx', '.h')
-            bootstrap_contents.append(BOOTSTRAP_PYX_CDEF % (h_path_name, module_name))
+            cdef_template = pkg_resources.resource_string('snakehouse', 'cdef.template').decode('utf8')
+            cdef_section.append(cdef_template % (h_path_name, module_name))
 
             if path:
                 complete_module_name = self.extension_name+'.'+'.'.join(path[1:].split(
@@ -74,25 +75,25 @@ class Multibuild:
 
             self.modules.add((complete_module_name, 'PyInit_%s()' % (module_name, )))
 
-        bootstrap_contents.append(BOOTSTRAP_PYX_GET_DEFINITION_HEADER)
+        get_definition = []
         modules = iter(self.modules)
         mod_name, init_fun_name = next(modules)
-        bootstrap_contents.append(BOOTSTRAP_PYX_GET_DEFINITION_IF % (repr(mod_name), init_fun_name))
+        get_definition.append(BOOTSTRAP_PYX_GET_DEFINITION_IF % (repr(mod_name), init_fun_name))
         for mod_name, init_fun_name in modules:
-            bootstrap_contents.append(BOOTSTRAP_PYX_GET_DEFINITION_ELIF % (
+            get_definition.append(BOOTSTRAP_PYX_GET_DEFINITION_ELIF % (
                 repr(mod_name), init_fun_name))
 
-        bootstrap_contents.append('\n')
-        bootstrap_contents.append(BOOTSTRAP_PYX_PACKAGE_LOADER % (
-            repr(set(x[0] for x in self.modules)), ))
-
-        return ''.join(bootstrap_contents)
+        return bootstrap_contents.format(cdef_section=''.join(cdef_section),
+                                         get_definition_section=''.join(get_definition),
+                                         module_set=repr(set(x[0] for x in self.modules)))
 
     def write_bootstrap_file(self):
         with open(os.path.join(self.bootstrap_directory, '__bootstrap__.pyx'), 'w') as f_out:
             f_out.write(self.generate_bootstrap())
 
     def alter_init(self):
+        pyinit_contents = pkg_resources.resource_string('snakehouse', 'initpy.template').decode('utf8')
+
         if os.path.exists(os.path.join(self.bootstrap_directory, '__init__.py')):
             with open(os.path.join(self.bootstrap_directory, '__init__.py'), 'r') as f_in:
                 data = f_in.read()
@@ -100,7 +101,7 @@ class Multibuild:
             data = ''
 
         if 'bootstrap_cython_submodules' not in data:
-            data = (INIT_PY_CONTENTS % (self.extension_name, )) + data
+            data = pyinit_contents.format(module_name=self.extension_name) + data
 
         with open(os.path.join(self.bootstrap_directory, '__init__.py'), 'w') as f_out:
             f_out.write(data)
