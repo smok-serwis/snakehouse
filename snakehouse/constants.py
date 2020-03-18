@@ -64,7 +64,7 @@ bootstrap_cython_submodules()
 """
 
 BOOTSTRAP_PYX_CDEF = """
-cdef extern from "%s"
+cdef extern from "%s":
     object PyInit_%s()    
 '"""
 
