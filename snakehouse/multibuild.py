@@ -1,23 +1,28 @@
-import typing as tp
 import os
 
 from setuptools import Extension
 
 
 class Multibuild:
-    def __init__(self, extension_name: str, files: tp.Iterable[str]):
+    def __init__(self, extension_name: str, files):
+        """
+        :param extension_name: the module name
+        :param files: list of pyx and c files
+        """
         self.files = list([file for file in files if not file.endswith('__bootstrap__.pyx')])
         file_name_set = set(os.path.split(file)[1] for file in self.files)
         if len(self.files) != len(file_name_set):
             raise ValueError('Two modules with the same name cannot appear together in a single '
                              'Multibuild')
 
+        self.sane_files = [file for file in files if file.endswith('.pyx')]
+
         self.extension_name = extension_name
         self.bootstrap_directory = os.path.commonpath(self.files)
         self.modules = set()    # tp.Set[tp.Tuple[str, str]]
 
     def generate_header_files(self):
-        for filename in self.files:
+        for filename in self.sane_files:
             path, name = os.path.split(filename)
             if not name.endswith('.pyx'):
                 continue
@@ -55,7 +60,7 @@ cdef extern from "Python.h":
     int PyModule_ExecDef(object module, PyModuleDef* definition)
 
 """]
-        for filename in self.files:
+        for filename in self.sane_files:
             path, name = os.path.split(filename)
             if path.startswith(self.bootstrap_directory):
                 path = path[len(self.bootstrap_directory):]
