@@ -18,7 +18,7 @@ cdef object get_definition_by_name(str name):
         return PyInit_${get_definition_section.pyinit_name}()
 % else:
     elif name == "${get_definition_section.module_name}":
-        return PyInit_
+        return PyInit_${get_definition_section.pyinit_name}()
 % endfor
 import sys
 
