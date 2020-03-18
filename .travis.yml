@@ -10,5 +10,5 @@ script:
  - cd example
  - python setup.py test
 install:
- - pip install Cython
+ - pip install Cython mako
  - python setup.py install
