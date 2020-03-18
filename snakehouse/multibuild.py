@@ -1,6 +1,9 @@
 import os
 
 from setuptools import Extension
+from .constants import BOOTSTRAP_PYX_HEADER, BOOTSTRAP_PYX_PACKAGE_LOADER, INIT_PY_CONTENTS, \
+    BOOTSTRAP_PYX_CDEF, BOOTSTRAP_PYX_GET_DEFINITION_HEADER, BOOTSTRAP_PYX_GET_DEFINITION_IF, \
+    BOOTSTRAP_PYX_GET_DEFINITION_ELIF
 
 
 class Multibuild:
@@ -50,16 +53,7 @@ class Multibuild:
                     f_out.write('\n'+exported_line+'\n')
 
     def generate_bootstrap(self) -> str:
-        bootstrap_contents = ["""
-cdef extern from "Python.h":
-    ctypedef struct PyModuleDef:
-        const char* m_name;
-
-    void Py_INCREF(object)
-    object PyModule_FromDefAndSpec(PyModuleDef *definition, object spec)
-    int PyModule_ExecDef(object module, PyModuleDef* definition)
-
-"""]
+        bootstrap_contents = [BOOTSTRAP_PYX_HEADER]
         for filename in self.sane_files:
             path, name = os.path.split(filename)
             if path.startswith(self.bootstrap_directory):
@@ -70,8 +64,7 @@ cdef extern from "Python.h":
                     replace('\\', '\\\\')
             else:
                 h_path_name = name.replace('.pyx', '.h')
-            bootstrap_contents.append('cdef extern from "%s":\n' % (h_path_name, ))
-            bootstrap_contents.append('    object PyInit_%s()\n\n' % (module_name, ))
+            bootstrap_contents.append(BOOTSTRAP_PYX_CDEF % (h_path_name, module_name))
 
             if path:
                 complete_module_name = self.extension_name+'.'+'.'.join(path[1:].split(
@@ -81,61 +74,17 @@ cdef extern from "Python.h":
 
             self.modules.add((complete_module_name, 'PyInit_%s()' % (module_name, )))
 
-        bootstrap_contents.append('''cdef object get_definition_by_name(str name):\n''')
+        bootstrap_contents.append(BOOTSTRAP_PYX_GET_DEFINITION_HEADER)
         modules = iter(self.modules)
         mod_name, init_fun_name = next(modules)
-        bootstrap_contents.append('''    if name == %s:
-        return %s
-''' % (repr(mod_name), init_fun_name))
+        bootstrap_contents.append(BOOTSTRAP_PYX_GET_DEFINITION_IF % (repr(mod_name), init_fun_name))
         for mod_name, init_fun_name in modules:
-            bootstrap_contents.append('''    elif name == %s:
-        return %s
-''' % (repr(mod_name), init_fun_name))
+            bootstrap_contents.append(BOOTSTRAP_PYX_GET_DEFINITION_ELIF % (
+                repr(mod_name), init_fun_name))
 
         bootstrap_contents.append('\n')
-        bootstrap_contents.append("""
-import sys        
-
-cdef class CythonPackageLoader:
-    cdef PyModuleDef* definition
-    cdef object def_o
-    cdef str name
-
-    def __init__(self, name):
-        self.def_o = get_definition_by_name(name)
-        self.definition = <PyModuleDef*>self.def_o
-        self.name = name
-        Py_INCREF(self.def_o)
-
-    def load_module(self, fullname):
-        raise ImportError
-
-    def create_module(self, spec):
-        if spec.name != self.name:
-            raise ImportError()
-        return PyModule_FromDefAndSpec(self.definition, spec)
-
-    def exec_module(self, module):
-        PyModule_ExecDef(module, self.definition)
-
-
-class CythonPackageMetaPathFinder:
-    def __init__(self, modules_set):
-        self.modules_set = modules_set
-
-    def find_module(self, fullname, path):
-        if fullname not in self.modules_set:
-            return None
-        return CythonPackageLoader(fullname)
-
-    def invalidate_caches(self):
-        pass
-        
-def bootstrap_cython_submodules():
-    modules_set = %s
-    sys.meta_path.append(CythonPackageMetaPathFinder(modules_set))
-    
-""" % (repr(set(x[0] for x in self.modules)), ))
+        bootstrap_contents.append(BOOTSTRAP_PYX_PACKAGE_LOADER % (
+            repr(set(x[0] for x in self.modules)), ))
 
         return ''.join(bootstrap_contents)
 
@@ -151,10 +100,7 @@ def bootstrap_cython_submodules():
             data = ''
 
         if 'bootstrap_cython_submodules' not in data:
-            data = ("""
-from %s.__bootstrap__ import bootstrap_cython_submodules
-bootstrap_cython_submodules()
-""" % (self.extension_name, )) + data
+            data = (INIT_PY_CONTENTS % (self.extension_name, )) + data
 
         with open(os.path.join(self.bootstrap_directory, '__init__.py'), 'w') as f_out:
             f_out.write(data)
