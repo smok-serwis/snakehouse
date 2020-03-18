@@ -1,5 +1,4 @@
 *.pyc
-*.c
 *.pyd
 .idea/
 *.egg-info
@@ -8,4 +7,4 @@ build
 */dist
 dist
 .eggs
-*.h
+
