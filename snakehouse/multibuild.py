@@ -1,5 +1,5 @@
 import os
-import importlib.resources
+import pkg_resources
 from setuptools import Extension
 from .constants import BOOTSTRAP_PYX_HEADER, BOOTSTRAP_PYX_PACKAGE_LOADER, INIT_PY_CONTENTS, \
     BOOTSTRAP_PYX_CDEF, BOOTSTRAP_PYX_GET_DEFINITION_HEADER, BOOTSTRAP_PYX_GET_DEFINITION_IF, \
@@ -53,7 +53,7 @@ class Multibuild:
                 f_out.write(data)
 
     def generate_bootstrap(self) -> str:
-        bootstrap_contents = importlib.resources.open_text('bootstrap.template').read()
+        bootstrap_contents = pkg_resources.resource_string('snakehouse', 'bootstrap.template')
         cdef_section = []
         for filename in self.pyx_files:
             path, name = os.path.split(filename)
@@ -92,7 +92,7 @@ class Multibuild:
             f_out.write(self.generate_bootstrap())
 
     def alter_init(self):
-        pyinit_contents = importlib.resources.open_text('pyinit.template').read()
+        pyinit_contents = pkg_resources.resource_string('snakehouse', 'initpy.template')
 
         if os.path.exists(os.path.join(self.bootstrap_directory, '__init__.py')):
             with open(os.path.join(self.bootstrap_directory, '__init__.py'), 'r') as f_in:
