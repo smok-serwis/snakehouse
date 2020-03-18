@@ -14,5 +14,5 @@ BOOTSTRAP_PYX_GET_DEFINITION_ELIF = """    elif name == %s:
 
 INCLUDE_PYTHON_H = '#include "Python.h"\n'
 
-INCLUDE_PYINIT = 'PyObject* PyInit_%s();'
+INCLUDE_PYINIT = 'PyObject* PyInit_%s(void);'
 
