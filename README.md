@@ -10,7 +10,7 @@ into a single extension.
 
 Inspired by [this StackOverflow discussion](https://stackoverflow.com/questions/30157363/collapse-multiple-submodules-to-one-cython-extension).
 
-Tested and works on Python 3.8 and Python 3.7, 
+Tested and works on CPython 3.8 and CPython 3.7, 
 both Windows and Linux.
 
 Usage
