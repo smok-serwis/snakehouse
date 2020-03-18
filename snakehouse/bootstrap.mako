@@ -12,14 +12,16 @@ cdef extern from "${cdef_section.h_file_name}":
 % endfor
 
 cdef object get_definition_by_name(str name):
-% for i, get_definition_section in enumerate(get_definition_sections):
+% for i, getdef_section in enumerate(get_definition_sections):
 % if i == 0:
-    if name == "${get_definition_section.module_name}":
-        return PyInit_${get_definition_section.pyinit_name}()
+    if name == "${getdef_section.module_name}":
+        return PyInit_${getdef_section.pyinit_name}()
 % else:
-    elif name == "${get_definition_section.module_name}":
-        return PyInit_${get_definition_section.pyinit_name}()
+    elif name == "${getdef_section.module_name}":
+        return PyInit_${getdef_section.pyinit_name}()
+% endif
 % endfor
+
 import sys
 
 cdef class CythonPackageLoader:
