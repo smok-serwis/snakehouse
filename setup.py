@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
-from cython_multibuild import __version__
+from snakehouse import __version__
 
 setup(keywords=['cython', 'extension', 'multiple', 'pyx'],
-      packages=find_packages(include=['cython_multibuild']),
+      packages=find_packages(include=['snakehouse']),
       version=__version__,
       install_requires=[
             'Cython'

@@ -1,26 +1,24 @@
-cython-multibuild
-=================
-[![Build Status](https://travis-ci.org/smok-serwis/cython-multibuild.svg)](https://travis-ci.org/smok-serwis/cython-multibuild)
-[![PyPI](https://img.shields.io/pypi/pyversions/cython-multibuild.svg)](https://pypi.python.org/pypi/cython-multibuild)
-[![PyPI version](https://badge.fury.io/py/cython-multibuild.svg)](https://badge.fury.io/py/cython-multibuild)
-[![PyPI](https://img.shields.io/pypi/implementation/cython-multibuild.svg)](https://pypi.python.org/pypi/cython-multibuild)
+snakehouse
+==========
+[![Build Status](https://travis-ci.org/smok-serwis/snakehouse.svg)](https://travis-ci.org/smok-serwis/snakehouse)
+[![PyPI](https://img.shields.io/pypi/pyversions/snakehouse.svg)](https://pypi.python.org/pypi/snakehouse)
+[![PyPI version](https://badge.fury.io/py/snakehouse.svg)](https://badge.fury.io/py/snakehouse)
+[![PyPI](https://img.shields.io/pypi/implementation/snakehouse.svg)](https://pypi.python.org/pypi/snakehouse)
 
-cython-multibuild is a tool to pack mutiple .pyx files
+snakehouse is a tool to pack mutiple .pyx files
 into a single extension.
 
 Inspired by [https://stackoverflow.com/questions/30157363/collapse-multiple-submodules-to-one-cython-extension](this StackOverflow discussion).
 
-This will monkey-patch Cython's Build.cythonize, so take care to import
-Build instead of Cythonize itself.
-
-Tested and works on Python 3.8 and Python 3.7.
+Tested and works on Python 3.8 and Python 3.7, 
+both Windows and Linux.
 
 Usage
 -----
 Take a look at [example](example/) on how to multi-build your Cython extensions.
 
-
 Limitations
 -----------
 
-* Two modules with the same name cannot be mentioned in a single Multibuild
+* Two modules with the same name cannot be mentioned in a single Multibuild.
+
