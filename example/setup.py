@@ -1,23 +1,27 @@
 from setuptools import setup, find_packages
 
 from snakehouse import Multibuild, build
+from setuptools import Extension
 
+# note that you can include standard Extension classes in this list, those won't be touched
+# and will be directed directly to Cython.Build.cythonize()
 cython_multibuilds = [
     Multibuild('example_module', ['example_module/test.pyx', 'example_module/test2.pyx',
                                   'example_module/test3/test3.pyx',
-                                  'example_module/test_n.c'])
+                                  'example_module/test_n.c']),
+    Extension('example', ['example.pyx'])
 ]
 
 # first argument is used directly by snakehouse, the rest and **kwargs are passed to
-# Cython.Build.cythonize
+# Cython.Build.cythonize()
 ext_modules = build(cython_multibuilds,
-                        compiler_directives={
-                            'language_level': '3',
-                        })
+                    compiler_directives={
+                       'language_level': '3',
+                    })
 
 setup(name='example_module',
       version='0.1',
-      packages=find_packages(include=['example_module']),
+      packages=['example_module', 'example'],
       install_requires=[
             'Cython', 'snakehouse'
       ],
