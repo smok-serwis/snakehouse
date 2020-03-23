@@ -1,6 +1,7 @@
 # v1.0.3
 
-* _TBA_
+* added the capability to insert standard `Extension`s
+  in the snakehouse build() command
 
 # v1.0.2
 
