@@ -9,7 +9,7 @@ cython_multibuilds = [
     Multibuild('example_module', ['example_module/test.pyx', 'example_module/test2.pyx',
                                   'example_module/test3/test3.pyx',
                                   'example_module/test_n.c']),
-    Extension('example.example', ['example/example.pyx'])
+    Extension('example2.example', ['example2/example.pyx'])
 ]
 
 # first argument is used directly by snakehouse, the rest and **kwargs are passed to
@@ -21,7 +21,7 @@ ext_modules = build(cython_multibuilds,
 
 setup(name='example_module',
       version='0.1',
-      packages=['example_module', 'example'],
+      packages=['example_module', 'example2'],
       install_requires=[
             'Cython', 'snakehouse'
       ],

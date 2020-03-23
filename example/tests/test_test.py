@@ -1,7 +1,7 @@
 from example_module.test import times_two
 from example_module.test2 import times_three, times_five
 from example_module.test3.test3 import times_four
-from example.example import test
+from example.example2 import test
 import unittest
 
 
