@@ -1,3 +1,7 @@
+# v1.1.1
+
+* _TBA_
+
 # v1.1
 
 * added the capability to insert standard `Extension`s
