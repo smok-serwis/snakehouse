@@ -1,4 +1,4 @@
-# v1.0.3
+# v1.1
 
 * added the capability to insert standard `Extension`s
   in the snakehouse build() command
