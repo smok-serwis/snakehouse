@@ -1,13 +1,10 @@
 import os
 import collections
 import typing as tp
-import logging
 import pkg_resources
 from satella.files import split
 from mako.template import Template
 from setuptools import Extension
-
-logger = logging.getLogger(__name__)
 
 
 CdefSection = collections.namedtuple('CdefSection', ('h_file_name', 'module_name'))
@@ -124,7 +121,6 @@ class Multibuild:
 
     def for_cythonize(self, *args, **kwargs):
         for_cythonize = [*self.files, os.path.join(self.bootstrap_directory, '__bootstrap__.pyx')]
-        logger.warning('For cythonize: %s', for_cythonize)
 
         return Extension(self.extension_name+".__bootstrap__",
                          for_cythonize,
