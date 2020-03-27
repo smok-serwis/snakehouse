@@ -1,6 +1,6 @@
 # v1.1.1
 
-* _TBA_
+* allowed Linux-style paths on Windows build environments
 
 # v1.1
 

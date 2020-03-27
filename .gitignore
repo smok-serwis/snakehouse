@@ -8,4 +8,6 @@ build
 dist
 .eggs
 *.c
+__bootstrap__.*
+
 

@@ -1,6 +1,7 @@
 import os
 import collections
 import pkg_resources
+from satella.files import split
 from mako.template import Template
 from setuptools import Extension
 
@@ -25,6 +26,8 @@ class Multibuild:
         :param extension_name: the module name
         :param files: list of pyx and c files
         """
+        # sanitize path separators so that Linux-style paths are supported on Windows
+        files = [os.path.join(*split(file)) for file in files]
         self.files = list([file for file in files if not file.endswith('__bootstrap__.pyx')])
         file_name_set = set(os.path.split(file)[1] for file in self.files)
         if len(self.files) != len(file_name_set):
