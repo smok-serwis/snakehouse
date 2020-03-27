@@ -3,8 +3,10 @@ from Cython.Build import cythonize
 from setuptools import Extension
 from .multibuild import Multibuild
 
+MultiBuildType = tp.Union[Multibuild, Exception]
 
-def build(extensions: tp.List[tp.Union[Multibuild, Extension]], *args, **kwargs):
+
+def build(extensions: tp.List[MultiBuildType], *args, **kwargs):
     returns = []
     for multi_build in extensions:
         if isinstance(multi_build, Extension):

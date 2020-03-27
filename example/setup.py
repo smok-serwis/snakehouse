@@ -7,8 +7,8 @@ from setuptools import Extension
 # and will be directed directly to Cython.Build.cythonize()
 cython_multibuilds = [
         # note that Windows-style pathes are supported on Linux build environment,
-        # also, the reverse is true
-    Multibuild('example_module', ['example_module\\test.pyx', 'example_module/test2.pyx',
+        # the reverse not necessarily being true (issue #2)
+    Multibuild('example_module', ['example_module/test.pyx', 'example_module/test2.pyx',
                                   'example_module/test3/test3.pyx',
                                   'example_module/test_n.c']),
     Extension('example2.example', ['example2/example.pyx']),
