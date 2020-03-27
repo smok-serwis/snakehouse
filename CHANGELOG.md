@@ -1,3 +1,8 @@
+# v1.1.2
+
+* bugfix release: fixed behaviour if there was only
+  a single file in Multibuild
+
 # v1.1.1
 
 * allowed Linux-style paths on Windows build environments

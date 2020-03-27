@@ -1,5 +1,6 @@
 import os
 import collections
+import typing as tp
 import pkg_resources
 from satella.files import split
 from mako.template import Template
@@ -21,7 +22,7 @@ class Multibuild:
     """
     This specifies a single Cython extension, called {extension_name}.__bootstrap__
     """
-    def __init__(self, extension_name: str, files):
+    def __init__(self, extension_name: str, files: tp.Iterator[str]):
         """
         :param extension_name: the module name
         :param files: list of pyx and c files
@@ -36,9 +37,12 @@ class Multibuild:
 
         self.pyx_files = [file for file in files if file.endswith('.pyx')]
 
-        self.extension_name = extension_name
-        self.bootstrap_directory = os.path.commonpath(self.files)
-        self.modules = set()    # tp.Set[tp.Tuple[str, str]]
+        self.extension_name = extension_name        # type: str
+        if len(self.files) == 1:
+            self.bootstrap_directory, _ = os.path.split(self.files[0])      # type: str
+        else:
+            self.bootstrap_directory = os.path.commonpath(self.files)       # type: str
+        self.modules = set()    # type: tp.Set[tp.Tuple[str, str]]
 
     def generate_header_files(self):
         for filename in self.pyx_files:
