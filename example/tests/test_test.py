@@ -2,10 +2,14 @@ from example_module.test import times_two
 from example_module.test2 import times_three, times_five
 from example_module.test3.test3 import times_four
 from example2.example import test
+from example3.example3.example3.test import test as test_three
 import unittest
 
 
 class TestExample(unittest.TestCase):
+    def test_three(self):
+        self.assertEqual(test_three(2, 3), 5)
+
     def test_test(self):
         self.assertEqual(test(2, 3), 5)
 
