@@ -27,9 +27,3 @@ Note what have you changed in
 Usage
 -----
 Take a look at [example](example/) on how to multi-build your Cython extensions.
-
-Limitations
------------
-
-* Two modules with the same name cannot be mentioned in a single Multibuild (issue #1).
-
