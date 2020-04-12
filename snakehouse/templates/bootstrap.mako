@@ -1,3 +1,5 @@
+import sys
+
 cdef extern from "Python.h":
     ctypedef struct PyModuleDef:
         const char* m_name;
@@ -22,7 +24,7 @@ cdef object get_definition_by_name(str name):
 % endif
 % endfor
 
-import sys
+
 
 cdef class CythonPackageLoader:
     cdef PyModuleDef* definition

@@ -10,6 +10,7 @@ cython_multibuilds = [
         # the reverse not necessarily being true (issue #5)
     Multibuild('example_module', ['example_module/test.pyx', 'example_module/test2.pyx',
                                   'example_module/test3/test3.pyx',
+                                  'example_module/test3/test2.pyx',
                                   'example_module/test_n.c']),
     Extension('example2.example', ['example2/example.pyx']),
     Multibuild('example3.example3.example3', ['example3/example3/example3/test.pyx'])
