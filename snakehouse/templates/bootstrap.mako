@@ -8,17 +8,17 @@ cdef extern from "Python.h":
 
 % for cdef_section in cdef_sections:
 cdef extern from "${cdef_section.h_file_name}":
-    object PyInit_${cdef_section.module_name}()
+    object PyInit_${cdef_section.coded_module_name}()
 % endfor
 
 cdef object get_definition_by_name(str name):
 % for i, getdef_section in enumerate(get_definition_sections):
 % if i == 0:
     if name == "${getdef_section.module_name}":
-        return PyInit_${getdef_section.pyinit_name}()
+        return PyInit_${getdef_section.coded_module_name}()
 % else:
     elif name == "${getdef_section.module_name}":
-        return PyInit_${getdef_section.pyinit_name}()
+        return PyInit_${getdef_section.coded_module_name}()
 % endif
 % endfor
 

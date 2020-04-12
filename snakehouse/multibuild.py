@@ -2,17 +2,19 @@ import os
 import collections
 import typing as tp
 import logging
+import uuid
+
 import pkg_resources
-from satella.files import split
+from satella.files import split, read_re_sub_and_write
 from mako.template import Template
 from setuptools import Extension
 
 logger = logging.getLogger(__name__)
 
 
-CdefSection = collections.namedtuple('CdefSection', ('h_file_name', 'module_name'))
+CdefSection = collections.namedtuple('CdefSection', ('h_file_name', 'module_name', 'coded_module_name'))
 GetDefinitionSection = collections.namedtuple('GetDefinitionSection', (
-    'module_name', 'pyinit_name'
+    'module_name', 'pyinit_name', 'coded_module_name'
 ))
 
 
@@ -47,6 +49,7 @@ class Multibuild:
         else:
             self.bootstrap_directory = os.path.commonpath(self.files)       # type: str
         self.modules = set()    # type: tp.Set[tp.Tuple[str, str]]
+        self.module_name_to_loader_function = collections.defaultdict(lambda: uuid.uuid4().hex)
 
     def generate_header_files(self):
         for filename in self.pyx_files:
@@ -77,12 +80,15 @@ class Multibuild:
             if path.startswith(self.bootstrap_directory):
                 path = path[len(self.bootstrap_directory):]
             module_name = name.replace('.pyx', '')
+            filename_c = name.replace('.pyx', '.c')
+            coded_module_name = self.module_name_to_loader_function[module_name]
+            read_re_sub_and_write(filename_c, '('+module_name.replace('.', r'\.')+')', lambda match: coded_module_name)
             if path:
                 h_path_name = os.path.join(path[1:], name.replace('.pyx', '.h')).\
                     replace('\\', '\\\\')
             else:
                 h_path_name = name.replace('.pyx', '.h')
-            cdef_section.append(CdefSection(h_path_name, module_name))
+            cdef_section.append(CdefSection(h_path_name, module_name, coded_module_name))
 
             if path:
                 complete_module_name = self.extension_name+'.'+'.'.join(path[1:].split(
@@ -90,11 +96,11 @@ class Multibuild:
             else:
                 complete_module_name = self.extension_name + '.'+module_name
 
-            self.modules.add((complete_module_name, module_name, ))
+            self.modules.add((complete_module_name, module_name, coded_module_name))
 
         get_definition = []
-        for mod_name, init_fun_name in self.modules:
-            get_definition.append(GetDefinitionSection(mod_name, init_fun_name))
+        for mod_name, init_fun_name, coded_module_name in self.modules:
+            get_definition.append(GetDefinitionSection(mod_name, init_fun_name, coded_module_name))
 
         return render_mako('bootstrap.mako', cdef_sections=cdef_section,
                                              get_definition_sections=get_definition,
