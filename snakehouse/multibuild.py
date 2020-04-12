@@ -66,25 +66,20 @@ class Multibuild:
         else:
             self.bootstrap_directory = os.path.commonpath(self.files)       # type: str
         self.modules = []    # type: tp.List[tp.Tuple[str, str, str]]
-        self.module_name_to_loader_function = KeyAwareDefaultDict(Multibuild.provide_default_hash)
-
-    @staticmethod
-    def provide_default_hash(path):
-        with open(path, 'rb') as f_in:
-            data = f_in.read()
-        return hashlib.sha256(data).hexdigest()
+        self.module_name_to_loader_function = {}
+        for filename in self.pyx_files:
+            with open(filename, 'rb') as f_in:
+                self.module_name_to_loader_function[filename] = hashlib.sha256(f_in.read()).hexdigest()
 
     def generate_header_files(self):
         for filename in self.pyx_files:
-            path, name, module_name, coded_module_name, complete_module_name = self.transform_module_name(filename)
+            path, name, cmod_name_path, module_name, coded_module_name, complete_module_name = self.transform_module_name(filename)
             if not name.endswith('.pyx'):
                 continue
 
-            h_name = name.replace('.pyx', '.h')
-            logger.warning('Header file h_name is %s %s' % (path, h_name))
-            h_file = os.path.join(path, h_name)
+            h_file = filename.replace('.pyx', '.h')
             if os.path.exists(h_file):
-                with open(h_file) as f_in:
+                with open(h_file, 'r') as f_in:
                     data = f_in.readlines()
 
                 linesep = 'cr' if '\r\n' in data[0] else 'lf'
@@ -106,6 +101,7 @@ class Multibuild:
         else:
             cmod_name_path = path
         path = cull_path(path)
+        cmod_name_path = cull_path(cmod_name_path)
 
         if path:
             intro = '.'.join((e for e in cmod_name_path.split(os.path.sep) if e))
@@ -119,17 +115,16 @@ class Multibuild:
             complete_module_name = '%s.%s' % (self.extension_name, module_name)
 
         coded_module_name = self.module_name_to_loader_function[filename]
-        logger.warning('Invoking with %s %s %s', module_name, coded_module_name, complete_module_name)
-        return path, name, module_name, coded_module_name, complete_module_name
+        return path, name, cmod_name_path, module_name, coded_module_name, complete_module_name
 
     def do_after_cython(self):
         for filename in self.pyx_files:
-            path, name, module_name, coded_module_name, complete_module_name = self.transform_module_name(filename)
+            path, name, cmod_name_path, module_name, coded_module_name, complete_module_name = self.transform_module_name(filename)
             to_replace = '__Pyx_PyMODINIT_FUNC PyInit_%s' % (module_name, )
             replace_with = '__Pyx_PyMODINIT_FUNC PyInit_%s' % (coded_module_name, )
             with open(filename.replace('.pyx', '.c'), 'r') as f_in:
-                data = f_in.read()
-                data = data.replace(to_replace, replace_with)
+                data_in = f_in.read()
+                data = data_in.replace(to_replace, replace_with)
             with open(filename.replace('.pyx', '.c'), 'w') as f_out:
                 f_out.write(data)
 
@@ -137,15 +132,12 @@ class Multibuild:
 
         cdef_section = []
         for filename in self.pyx_files:
-            path, name, module_name, coded_module_name, complete_module_name = self.transform_module_name(filename)
+            path, name, cmod_name_path, module_name, coded_module_name, complete_module_name = self.transform_module_name(filename)
 
             if os.path.exists(filename.replace('.pyx', '.c')):
                 os.unlink(filename.replace('.pyx', '.c'))
 
-            if path:
-                h_path_name = filename.replace('.pyx', '.h').replace('\\', '\\\\')
-            else:
-                h_path_name = name.replace('.pyx', '.h')
+            h_path_name = os.path.join(cmod_name_path, name.replace('.pyx', '.h')).replace('\\', '\\\\')
 
             cdef_section.append(CdefSection(h_path_name, module_name, coded_module_name))
 
@@ -177,14 +169,12 @@ class Multibuild:
             f_out.write(data)
 
     def generate(self):
-        self.write_bootstrap_file()
         self.generate_header_files()
+        self.write_bootstrap_file()
         self.alter_init()
 
     def for_cythonize(self, *args, **kwargs):
         for_cythonize = [*self.files, os.path.join(self.bootstrap_directory, '__bootstrap__.pyx')]
-        logger.warning('For cythonize: %s', for_cythonize)
-        logger.warning(self.module_name_to_loader_function)
         return Extension(self.extension_name+".__bootstrap__",
                          for_cythonize,
                          *args,

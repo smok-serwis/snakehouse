@@ -1,3 +1,7 @@
+# v1.2
+
+* fixed issue #1
+
 # v1.1.2
 
 * bugfix release: fixed behaviour if there was only
