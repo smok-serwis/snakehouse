@@ -1,3 +1,4 @@
+import hashlib
 import os
 import collections
 import typing as tp
@@ -7,16 +8,35 @@ from mako.template import Template
 from setuptools import Extension
 
 
-CdefSection = collections.namedtuple('CdefSection', ('h_file_name', 'module_name'))
+CdefSection = collections.namedtuple('CdefSection', ('h_file_name', 'module_name', 'coded_module_name'))
 GetDefinitionSection = collections.namedtuple('GetDefinitionSection', (
-    'module_name', 'pyinit_name'
+    'module_name', 'pyinit_name', 'coded_module_name'
 ))
+
+
+def load_mako_lines(template_name: str) -> tp.List[str]:
+    return pkg_resources.resource_string('snakehouse', os.path.join('templates', template_name)).decode('utf8')
+
+
+def cull_path(path):
+    if not path:
+        return path
+    if path[0] == os.path.sep:
+        if len(path) > 1:
+            if path[1] == os.path.sep:
+                return path[2:]
+        return path[1:]
+    else:
+        return path
 
 
 def render_mako(template_name: str, **kwargs) -> str:
     tpl = Template(pkg_resources.resource_string(
         'snakehouse', os.path.join('templates', template_name)).decode('utf8'))
     return tpl.render(**kwargs)
+
+
+LINES_IN_HFILE = len(load_mako_lines('hfile.mako').split('\n'))
 
 
 class Multibuild:
@@ -29,12 +49,9 @@ class Multibuild:
         :param files: list of pyx and c files
         """
         # sanitize path separators so that Linux-style paths are supported on Windows
+        files = list(files)
         files = [os.path.join(*split(file)) for file in files]
         self.files = list([file for file in files if not file.endswith('__bootstrap__.pyx')])
-        file_name_set = set(os.path.split(file)[1] for file in self.files)
-        if len(self.files) != len(file_name_set):
-            raise ValueError('Two modules with the same name cannot appear together in a single '
-                             'Multibuild')
 
         self.pyx_files = [file for file in files if file.endswith('.pyx')]
 
@@ -43,55 +60,87 @@ class Multibuild:
             self.bootstrap_directory, _ = os.path.split(self.files[0])      # type: str
         else:
             self.bootstrap_directory = os.path.commonpath(self.files)       # type: str
-        self.modules = set()    # type: tp.Set[tp.Tuple[str, str]]
+        self.modules = []    # type: tp.List[tp.Tuple[str, str, str]]
+        self.module_name_to_loader_function = {}
+        for filename in self.pyx_files:
+            with open(filename, 'rb') as f_in:
+                self.module_name_to_loader_function[filename] = hashlib.sha256(f_in.read()).hexdigest()
 
     def generate_header_files(self):
         for filename in self.pyx_files:
-            path, name = os.path.split(filename)
+            path, name, cmod_name_path, module_name, coded_module_name, complete_module_name = self.transform_module_name(filename)
             if not name.endswith('.pyx'):
                 continue
 
-            module_name = name.replace('.pyx', '')
-            h_name = name.replace('.pyx', '.h')
+            h_file = filename.replace('.pyx', '.h')
+            if os.path.exists(h_file):
+                with open(h_file, 'r') as f_in:
+                    data = f_in.readlines()
 
-            if os.path.exists(h_name):
-                with open(os.path.join(path, h_name), 'r') as f_in:
-                    data = f_in.read()
+                linesep = 'cr' if '\r\n' in data[0] else 'lf'
 
-                if 'PyObject* PyInit_' not in data:
-                    data = render_mako('hfile.mako', initpy_name=module_name) + data
+                if not any('PyObject* PyInit_' in line for line in data):
+                    data = [render_mako('hfile.mako', initpy_name=coded_module_name)+ \
+                            '\r\n' if linesep == 'cr' else '\n'] + data[LINES_IN_HFILE:]
             else:
-                data = render_mako('hfile.mako', initpy_name=module_name)
+                data = render_mako('hfile.mako', initpy_name=coded_module_name)
 
-            with open(os.path.join(path, h_name), 'w') as f_out:
+            with open(h_file, 'w') as f_out:
+                f_out.write(''.join(data))
+
+    def transform_module_name(self, filename):
+        path, name = os.path.split(filename)
+        module_name = name.replace('.pyx', '')
+        if path.startswith(self.bootstrap_directory):
+            cmod_name_path = path[len(self.bootstrap_directory):]
+        else:
+            cmod_name_path = path
+        path = cull_path(path)
+        cmod_name_path = cull_path(cmod_name_path)
+
+        if path:
+            intro = '.'.join((e for e in cmod_name_path.split(os.path.sep) if e))
+            if not intro:
+                complete_module_name = '%s.%s' % (self.extension_name, module_name)
+            else:
+                complete_module_name = '%s.%s.%s' % (self.extension_name,
+                                                     intro,
+                                                     module_name)
+        else:
+            complete_module_name = '%s.%s' % (self.extension_name, module_name)
+
+        coded_module_name = self.module_name_to_loader_function[filename]
+        return path, name, cmod_name_path, module_name, coded_module_name, complete_module_name
+
+    def do_after_cython(self):
+        for filename in self.pyx_files:
+            path, name, cmod_name_path, module_name, coded_module_name, complete_module_name = self.transform_module_name(filename)
+            to_replace = '__Pyx_PyMODINIT_FUNC PyInit_%s' % (module_name, )
+            replace_with = '__Pyx_PyMODINIT_FUNC PyInit_%s' % (coded_module_name, )
+            with open(filename.replace('.pyx', '.c'), 'r') as f_in:
+                data_in = f_in.read()
+                data = data_in.replace(to_replace, replace_with)
+            with open(filename.replace('.pyx', '.c'), 'w') as f_out:
                 f_out.write(data)
 
     def generate_bootstrap(self) -> str:
 
         cdef_section = []
         for filename in self.pyx_files:
-            path, name = os.path.split(filename)
-            if path.startswith(self.bootstrap_directory):
-                path = path[len(self.bootstrap_directory):]
-            module_name = name.replace('.pyx', '')
-            if path:
-                h_path_name = os.path.join(path[1:], name.replace('.pyx', '.h')).\
-                    replace('\\', '\\\\')
-            else:
-                h_path_name = name.replace('.pyx', '.h')
-            cdef_section.append(CdefSection(h_path_name, module_name))
+            path, name, cmod_name_path, module_name, coded_module_name, complete_module_name = self.transform_module_name(filename)
 
-            if path:
-                complete_module_name = self.extension_name+'.'+'.'.join(path[1:].split(
-                    os.path.sep))+'.'+module_name
-            else:
-                complete_module_name = self.extension_name + '.'+module_name
+            if os.path.exists(filename.replace('.pyx', '.c')):
+                os.unlink(filename.replace('.pyx', '.c'))
 
-            self.modules.add((complete_module_name, module_name, ))
+            h_path_name = os.path.join(cmod_name_path, name.replace('.pyx', '.h')).replace('\\', '\\\\')
+
+            cdef_section.append(CdefSection(h_path_name, module_name, coded_module_name))
+
+            self.modules.append((complete_module_name, module_name, coded_module_name))
 
         get_definition = []
-        for mod_name, init_fun_name in self.modules:
-            get_definition.append(GetDefinitionSection(mod_name, init_fun_name))
+        for mod_name, init_fun_name, coded_module_name in self.modules:
+            get_definition.append(GetDefinitionSection(mod_name, init_fun_name, coded_module_name))
 
         return render_mako('bootstrap.mako', cdef_sections=cdef_section,
                                              get_definition_sections=get_definition,
@@ -121,7 +170,6 @@ class Multibuild:
 
     def for_cythonize(self, *args, **kwargs):
         for_cythonize = [*self.files, os.path.join(self.bootstrap_directory, '__bootstrap__.pyx')]
-
         return Extension(self.extension_name+".__bootstrap__",
                          for_cythonize,
                          *args,
