@@ -3,11 +3,9 @@ import os
 import collections
 import typing as tp
 import logging
-import uuid
 
 import pkg_resources
-from satella.files import split, read_re_sub_and_write
-from satella.coding.structures import KeyAwareDefaultDict
+from satella.files import split
 from mako.template import Template
 from setuptools import Extension
 
@@ -40,6 +38,7 @@ def render_mako(template_name: str, **kwargs) -> str:
     tpl = Template(pkg_resources.resource_string(
         'snakehouse', os.path.join('templates', template_name)).decode('utf8'))
     return tpl.render(**kwargs)
+
 
 LINES_IN_HFILE = len(load_mako_lines('hfile.mako').split('\n'))
 
