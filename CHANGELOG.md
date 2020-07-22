@@ -1,3 +1,7 @@
+# v1.2.3
+
+* _TBA_
+
 # v1.2.2
 
 * snakehouse will pass the remaining arguments to Multibuild to Cython's Extension
