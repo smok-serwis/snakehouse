@@ -1,6 +1,11 @@
+# v1.2.2
+
+* snakehouse will pass the remaining arguments to Multibuild to Cython's Extension
+
 # v1.2.1
 
-* _TBA_
+* snakehouse won't complain anymore if installing 
+  from a source wheel
 
 # v1.2
 

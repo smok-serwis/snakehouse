@@ -25,7 +25,6 @@ cdef object get_definition_by_name(str name):
 % endfor
 
 
-
 cdef class CythonPackageLoader:
     cdef PyModuleDef* definition
     cdef object def_o

@@ -1,7 +1,10 @@
 import hashlib
 import os
+import logging
 import collections
 import typing as tp
+import warnings
+
 import pkg_resources
 from satella.files import split
 from mako.template import Template
@@ -12,6 +15,8 @@ CdefSection = collections.namedtuple('CdefSection', ('h_file_name', 'module_name
 GetDefinitionSection = collections.namedtuple('GetDefinitionSection', (
     'module_name', 'pyinit_name', 'coded_module_name'
 ))
+
+logger = logging.getLogger(__name__)
 
 
 def load_mako_lines(template_name: str) -> tp.List[str]:
@@ -42,48 +47,66 @@ LINES_IN_HFILE = len(load_mako_lines('hfile.mako').split('\n'))
 class Multibuild:
     """
     This specifies a single Cython extension, called {extension_name}.__bootstrap__
+
+    All kwargs will be sent straight to Cython's Extension
+    :param extension_name: the module name
+    :param files: list of pyx and c files
     """
-    def __init__(self, extension_name: str, files: tp.Iterator[str]):
-        """
-        :param extension_name: the module name
-        :param files: list of pyx and c files
-        """
+    def __init__(self, extension_name: str, files: tp.Iterator[str], **kwargs):
         # sanitize path separators so that Linux-style paths are supported on Windows
         files = list(files)
-        files = [os.path.join(*split(file)) for file in files]
-        self.files = list([file for file in files if not file.endswith('__bootstrap__.pyx')])
-
-        self.pyx_files = [file for file in files if file.endswith('.pyx')]
-
-        self.extension_name = extension_name        # type: str
-        if len(self.files) == 1:
-            self.bootstrap_directory, _ = os.path.split(self.files[0])      # type: str
+        self.kwargs = kwargs
+        if files:
+            files = [os.path.join(*split(file)) for file in files]
+            self.files = list([file for file in files if not file.endswith('__bootstrap__.pyx')])
+            logger.warning(str(self.files))
+            self.pyx_files = [file for file in self.files if file.endswith('.pyx')]
         else:
-            self.bootstrap_directory = os.path.commonpath(self.files)       # type: str
-        self.modules = []    # type: tp.List[tp.Tuple[str, str, str]]
-        self.module_name_to_loader_function = {}
-        for filename in self.pyx_files:
-            with open(filename, 'rb') as f_in:
-                self.module_name_to_loader_function[filename] = hashlib.sha256(f_in.read()).hexdigest()
+            self.pyx_files = []
+
+        self.do_generate = True
+        if not self.pyx_files:
+            warnings.warn('No pyx files, probably installing from a source archive, skipping '
+                          'generating files', RuntimeWarning)
+            self.do_generate = False
+        else:
+            self.extension_name = extension_name        # type: str
+            if len(self.files) == 1:
+                self.bootstrap_directory, _ = os.path.split(self.files[0])      # type: str
+            else:
+                self.bootstrap_directory = os.path.commonpath(self.files)       # type: str
+            self.modules = []    # type: tp.List[tp.Tuple[str, str, str]]
+            self.module_name_to_loader_function = {}
+            for filename in self.pyx_files:
+                with open(filename, 'rb') as f_in:
+                    self.module_name_to_loader_function[filename] = hashlib.sha256(f_in.read()).hexdigest()
 
     def generate_header_files(self):
         for filename in self.pyx_files:
             path, name, cmod_name_path, module_name, coded_module_name, complete_module_name = self.transform_module_name(filename)
+            logger.warning('Generating header file for %s' % (filename, ))
             if not name.endswith('.pyx'):
                 continue
 
             h_file = filename.replace('.pyx', '.h')
+
             if os.path.exists(h_file):
                 with open(h_file, 'r') as f_in:
                     data = f_in.readlines()
 
                 linesep = 'cr' if '\r\n' in data[0] else 'lf'
+                rendered_mako = render_mako('hfile.mako', initpy_name=coded_module_name) + \
+                                '\r\n' if linesep == 'cr' else '\n'
+                assert len(rendered_mako) > 0
 
-                if not any('PyObject* PyInit_' in line for line in data):
-                    data = [render_mako('hfile.mako', initpy_name=coded_module_name)+ \
-                            '\r\n' if linesep == 'cr' else '\n'] + data[LINES_IN_HFILE:]
+                if any('#define SNAKEHOUSE_FILE' in line for line in data):
+                    data = [rendered_mako, *data[LINES_IN_HFILE:]]
+                else:
+                    data = [rendered_mako, *data]
             else:
-                data = render_mako('hfile.mako', initpy_name=coded_module_name)
+                rendered_mako = render_mako('hfile.mako', initpy_name=coded_module_name)
+                assert len(rendered_mako) > 0
+                data = rendered_mako
 
             with open(h_file, 'w') as f_out:
                 f_out.write(''.join(data))
@@ -113,6 +136,7 @@ class Multibuild:
         return path, name, cmod_name_path, module_name, coded_module_name, complete_module_name
 
     def do_after_cython(self):
+        self.generate_header_files()
         for filename in self.pyx_files:
             path, name, cmod_name_path, module_name, coded_module_name, complete_module_name = self.transform_module_name(filename)
             to_replace = '__Pyx_PyMODINIT_FUNC PyInit_%s' % (module_name, )
@@ -164,11 +188,12 @@ class Multibuild:
             f_out.write(data)
 
     def generate(self):
-        self.generate_header_files()
-        self.write_bootstrap_file()
-        self.alter_init()
+        if self.do_generate:
+            self.write_bootstrap_file()
+            self.alter_init()
 
     def for_cythonize(self, *args, **kwargs):
+        kwargs.update(self.kwargs)
         for_cythonize = [*self.files, os.path.join(self.bootstrap_directory, '__bootstrap__.pyx')]
         return Extension(self.extension_name+".__bootstrap__",
                          for_cythonize,
