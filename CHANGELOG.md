@@ -1,3 +1,7 @@
+# v1.2.4
+
+* _TBA_
+
 # v1.2.3
 
 * `Multibuild` will pass given kwargs to `Extension` object
