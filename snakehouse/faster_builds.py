@@ -1,4 +1,5 @@
 import multiprocessing
+import typing as tp
 
 __all__ = ['monkey_patch_parallel_compilation']
 
