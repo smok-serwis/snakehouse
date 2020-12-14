@@ -51,6 +51,7 @@ class Multibuild:
     All kwargs will be sent straight to Cython's Extension
     :param extension_name: the module name
     :param files: list of pyx and c files
+    :param kwargs: extra arguments to be passed to Extension() object
     """
     def __init__(self, extension_name: str, files: tp.Iterator[str], **kwargs):
         # sanitize path separators so that Linux-style paths are supported on Windows

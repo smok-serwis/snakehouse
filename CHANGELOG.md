@@ -1,6 +1,7 @@
 # v1.2.3
 
-* _TBA_
+* `Multibuild` will pass given kwargs to `Extension` object
+* added an option to monkey-patch `distutils` to compile multicore
 
 # v1.2.2
 

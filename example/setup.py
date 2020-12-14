@@ -1,7 +1,9 @@
 from setuptools import setup
 
-from snakehouse import Multibuild, build
+from snakehouse import Multibuild, build, monkey_patch_parallel_compilation
 from setuptools import Extension
+
+monkey_patch_parallel_compilation()
 
 # note that you can include standard Extension classes in this list, those won't be touched
 # and will be directed directly to Cython.Build.cythonize()
@@ -11,7 +13,8 @@ cython_multibuilds = [
     Multibuild('example_module', ['example_module/test.pyx', 'example_module/test2.pyx',
                                   'example_module/test3/test3.pyx',
                                   'example_module/test3/test2.pyx',
-                                  'example_module/test_n.c']),
+                                  'example_module/test_n.c'],
+               define_macros=[("CYTHON_TRACE_NOGIL", "1")]),
     Extension('example2.example', ['example2/example.pyx']),
     Multibuild('example3.example3.example3', ['example3/example3/example3/test.pyx'])
 ]
