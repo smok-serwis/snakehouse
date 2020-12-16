@@ -27,3 +27,8 @@ Note what have you changed in
 Usage
 -----
 Take a look at [example](example/) on how to multi-build your Cython extensions.
+
+Don't place modules compiled that way in root .py file's top level imports.
+Wrap them in a layer of indirection instead!
+
+This applies to unit tests as well!
