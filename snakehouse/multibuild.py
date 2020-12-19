@@ -56,7 +56,7 @@ class Multibuild:
         as a separate extension. It is for these cases when you're testing and something segfaults.
     """
     def __init__(self, extension_name: str, files: tp.Iterator[str],
-                 dont_snakehouse: bool = False,**kwargs):
+                 dont_snakehouse: bool = False, **kwargs):
         # sanitize path separators so that Linux-style paths are supported on Windows
         files = list(files)
         self.dont_snakehouse = dont_snakehouse
@@ -202,9 +202,11 @@ class Multibuild:
     def for_cythonize(self, *args, **kwargs):
         if self.dont_snakehouse:
             extensions = []
+            common_path = os.path.commonpath(self.pyx_files)
             for pyx_file in self.pyx_files:
-                ext = Extension(pyx_file.replace(os.pathsep, '.')[:-4],
-                                [pyx_file])
+                file_name = pyx_file[len(common_path)+len(os.pathsep):-4]
+                ext = Extension(file_name.replace(os.pathsep, '.'),
+                                [file_name])
                 extensions.append(ext)
             return extensions
         else:

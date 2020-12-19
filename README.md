@@ -24,11 +24,17 @@ a part of your pull request as well!
 Note what have you changed in
 [CHANGELOG.md](/CHANGELOG.md) as well!
 
-Usage
------
+Usage notes
+-----------
 Take a look at [example](example/) on how to multi-build your Cython extensions.
 
 Don't place modules compiled that way in root .py file's top level imports.
 Wrap them in a layer of indirection instead!
 
 This applies to unit tests as well!
+
+When something goes wrong (eg. the application throws an unhandled exception)
+the built module has a tendency to dump core.
+Try to debug it first by passing `dont_snakehouse=True` to your
+modules in the debug mode.
+
