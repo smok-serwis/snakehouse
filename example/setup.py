@@ -9,6 +9,7 @@ monkey_patch_parallel_compilation()
 
 dont_snakehouse = False
 if 'DEBUG' in os.environ:
+    print('Debug is enabled!')
     dont_snakehouse = True
 
 

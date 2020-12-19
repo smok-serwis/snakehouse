@@ -56,7 +56,8 @@ class Multibuild:
         as a separate extension. It is for these cases when you're testing and something segfaults.
     """
     def __init__(self, extension_name: str, files: tp.Iterator[str],
-                 dont_snakehouse: bool = False, **kwargs):
+                 dont_snakehouse: bool = False,
+                 **kwargs):
         # sanitize path separators so that Linux-style paths are supported on Windows
         files = list(files)
         self.dont_snakehouse = dont_snakehouse
@@ -66,8 +67,10 @@ class Multibuild:
             self.files = list([file for file in files if not file.endswith('__bootstrap__.pyx')])
             logger.warning(str(self.files))
             self.pyx_files = [file for file in self.files if file.endswith('.pyx')]
+            self.c_files = [file for file in self.files if file.endswith('.c') or file.endswith('.cpp')]
         else:
             self.pyx_files = []
+            self.c_files = []
 
         self.do_generate = True
         if not self.pyx_files:
@@ -204,9 +207,9 @@ class Multibuild:
             extensions = []
             len_to_sub = len(self.bootstrap_directory) + len(os.path.pathsep)
             for pyx_file in self.pyx_files:
-                file_name = pyx_file[len_to_sub:-4].replace(os.pathsep, '.')
-                ext = Extension(file_name,
-                                [pyx_file], *args, **kwargs)
+                file_name = pyx_file[len_to_sub:-4].replace('\\', '.').replace('/', '.')
+                ext = Extension(self.extension_name+'.'+file_name,
+                                [pyx_file] + self.c_files, *args, **kwargs)
                 extensions.append(ext)
             return extensions
         else:
