@@ -202,11 +202,11 @@ class Multibuild:
     def for_cythonize(self, *args, **kwargs):
         if self.dont_snakehouse:
             extensions = []
-            common_path = os.path.commonpath(self.pyx_files)
+            len_to_sub = len(self.bootstrap_directory) + len(os.path.pathsep)
             for pyx_file in self.pyx_files:
-                file_name = pyx_file[len(common_path)+len(os.pathsep):-4]
-                ext = Extension(file_name.replace(os.pathsep, '.'),
-                                [file_name])
+                file_name = pyx_file[len_to_sub:-4].replace(os.pathsep, '.')
+                ext = Extension(file_name,
+                                [pyx_file], *args, **kwargs)
                 extensions.append(ext)
             return extensions
         else:
