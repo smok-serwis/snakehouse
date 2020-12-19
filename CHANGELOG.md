@@ -1,3 +1,7 @@
+# v1.3.1
+
+* _TBA_
+
 # v1.3
 
 * added an option to build every file as a separate extension, for
