@@ -1,6 +1,7 @@
-# v1.2.4
+# v1.3
 
-* _TBA_
+* added an option to build every file as a separate extension, for
+  usage in tests
 
 # v1.2.3
 

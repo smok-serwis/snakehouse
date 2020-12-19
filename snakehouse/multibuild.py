@@ -52,10 +52,14 @@ class Multibuild:
     :param extension_name: the module name
     :param files: list of pyx and c files
     :param kwargs: extra arguments to be passed to Extension() object
+    :param dont_snakehouse: snakehouse won't be enabled, each element will be built
+        as a separate extension. It is for these cases when you're testing and something segfaults.
     """
-    def __init__(self, extension_name: str, files: tp.Iterator[str], **kwargs):
+    def __init__(self, extension_name: str, files: tp.Iterator[str],
+                 dont_snakehouse: bool = False,**kwargs):
         # sanitize path separators so that Linux-style paths are supported on Windows
         files = list(files)
+        self.dont_snakehouse = dont_snakehouse
         self.kwargs = kwargs
         if files:
             files = [os.path.join(*split(file)) for file in files]
@@ -137,6 +141,8 @@ class Multibuild:
         return path, name, cmod_name_path, module_name, coded_module_name, complete_module_name
 
     def do_after_cython(self):
+        if self.dont_snakehouse:
+            return
         self.generate_header_files()
         for filename in self.pyx_files:
             path, name, cmod_name_path, module_name, coded_module_name, complete_module_name = self.transform_module_name(filename)
@@ -189,14 +195,22 @@ class Multibuild:
             f_out.write(data)
 
     def generate(self):
-        if self.do_generate:
+        if not self.dont_snakehouse and self.do_generate:
             self.write_bootstrap_file()
             self.alter_init()
 
     def for_cythonize(self, *args, **kwargs):
-        kwargs.update(self.kwargs)
-        for_cythonize = [*self.files, os.path.join(self.bootstrap_directory, '__bootstrap__.pyx')]
-        return Extension(self.extension_name+".__bootstrap__",
-                         for_cythonize,
-                         *args,
-                         **kwargs)
+        if self.dont_snakehouse:
+            extensions = []
+            for pyx_file in self.pyx_files:
+                ext = Extension(pyx_file.replace(os.pathsep, '.')[:-4],
+                                [pyx_file])
+                extensions.append(ext)
+            return extensions
+        else:
+            kwargs.update(self.kwargs)
+            for_cythonize = [*self.files, os.path.join(self.bootstrap_directory, '__bootstrap__.pyx')]
+            return [Extension(self.extension_name+".__bootstrap__",
+                              for_cythonize,
+                              *args,
+                              **kwargs)]

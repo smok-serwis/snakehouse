@@ -18,7 +18,7 @@ def build(extensions: tp.List[MultiBuildType], *args, **kwargs):
         elif isinstance(multi_build, Multibuild):
             multi_build.generate()
             multi_builds.append(multi_build)
-            returns.append(multi_build.for_cythonize())
+            returns.extend(multi_build.for_cythonize())
         else:
             raise ValueError('Invalid value in list, expected either an instance of Multibuild '
                              'or an Extension')

@@ -1,9 +1,16 @@
+import os
+
 from setuptools import setup
 
 from snakehouse import Multibuild, build, monkey_patch_parallel_compilation
 from setuptools import Extension
 
 monkey_patch_parallel_compilation()
+
+dont_snakehouse = False
+if 'DEBUG' in os.environ:
+    dont_snakehouse = True
+
 
 # note that you can include standard Extension classes in this list, those won't be touched
 # and will be directed directly to Cython.Build.cythonize()
@@ -14,9 +21,11 @@ cython_multibuilds = [
                                   'example_module/test3/test3.pyx',
                                   'example_module/test3/test2.pyx',
                                   'example_module/test_n.c'],
-               define_macros=[("CYTHON_TRACE_NOGIL", "1")]),
+               define_macros=[("CYTHON_TRACE_NOGIL", "1")],
+               dont_snakehouse=dont_snakehouse),
     Extension('example2.example', ['example2/example.pyx']),
-    Multibuild('example3.example3.example3', ['example3/example3/example3/test.pyx'])
+    Multibuild('example3.example3.example3', ['example3/example3/example3/test.pyx'],
+               dont_snakehouse=dont_snakehouse)
 ]
 
 # first argument is used directly by snakehouse, the rest and **kwargs are passed to

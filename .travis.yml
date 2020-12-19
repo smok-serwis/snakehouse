@@ -15,3 +15,5 @@ install:
 after_success:
   - cd ..
   - bash build.sh
+env:
+ - DEBUG=true
