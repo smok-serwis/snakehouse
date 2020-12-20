@@ -9,5 +9,5 @@ dist
 .eggs
 *.c
 __bootstrap__.*
-
+venv/
 
