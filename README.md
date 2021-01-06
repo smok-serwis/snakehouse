@@ -26,6 +26,20 @@ a part of your pull request as well!
 Note what have you changed in
 [CHANGELOG.md](/CHANGELOG.md) as well!
 
+Accelerating builds
+-------------------
+
+distutils by default compiles using a single process. To enable faster, multiprocess compilations
+just type:
+
+```python
+from snakehouse import monkey_patch_parallel_compilation
+
+monkey_patch_parallel_compilation()
+````
+
+Before your `setup()` call.
+
 Usage notes - MANDATORY READING
 -------------------------------
 Take a look at [example](example/) on how to multi-build your Cython extensions.
