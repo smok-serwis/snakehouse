@@ -1,4 +1,6 @@
 import logging
+import multiprocessing
+import sys
 import typing as tp
 from Cython.Build import cythonize
 from setuptools import Extension
@@ -9,7 +11,10 @@ MultiBuildType = tp.Union[Multibuild, Exception]
 logger = logging.getLogger(__name__)
 
 
-def build(extensions: tp.List[MultiBuildType], *args, **kwargs):
+def build(extensions: tp.List[MultiBuildType], *args, nthreads=None, **kwargs):
+    if nthreads is None:
+        nthreads = multiprocessing.cpu_count()
+    kwargs['nthreads'] = nthreads
     returns = []
     multi_builds = []
     for multi_build in extensions:
