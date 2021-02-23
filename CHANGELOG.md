@@ -1,3 +1,7 @@
+# v1.3.2
+
+* _TBA_
+
 # v1.3.1
 
 * Cython build step ("cythonize") will be parallelized by default
