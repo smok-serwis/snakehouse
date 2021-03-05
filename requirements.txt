@@ -1,3 +1,3 @@
 Cython
 mako
-satella
+satella>=2.14.46
