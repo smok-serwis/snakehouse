@@ -1,3 +1,7 @@
+# v1.3.3
+
+* _TBA_
+
 # v1.3.2
 
 * added `read_requirements_txt`
