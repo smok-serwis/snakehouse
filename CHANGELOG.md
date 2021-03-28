@@ -1,3 +1,7 @@
+# v1.5
+
+* _TBA_
+
 # v1.4
 
 * added `find_pyx`, `find_c` and `find_pyx_and_c`
