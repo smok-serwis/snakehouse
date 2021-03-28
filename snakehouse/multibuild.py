@@ -49,11 +49,12 @@ class Multibuild:
     This specifies a single Cython extension, called {extension_name}.__bootstrap__
 
     All kwargs will be sent straight to Cython's Extension
+
     :param extension_name: the module name
     :param files: list of pyx and c files
     :param kwargs: extra arguments to be passed to Extension() object
     :param dont_snakehouse: snakehouse won't be enabled, each element will be built
-        as a separate extension. It is for these cases when you're testing and something segfaults.
+      as a separate extension. It is for these cases when you're testing and something segfaults.
     """
     def __init__(self, extension_name: str, files: tp.Iterator[str],
                  dont_snakehouse: bool = False,

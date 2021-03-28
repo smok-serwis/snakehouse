@@ -1,4 +1,40 @@
-from satella.files import read_lines
+import typing as tp
+from satella.coding import for_argument
+from satella.files import read_lines, find_files
+
+
+@for_argument(returns=list)
+def find_pyx(directory_path: str) -> tp.List[str]:
+    """
+    Return all .pyx files found in given directory.
+
+    :param directory_path: directory to look through
+    :return: .pyx files found
+    """
+    return find_files(directory_path, r'(.*)\.pyx', scan_subdirectories=True)
+
+
+@for_argument(returns=list)
+def find_c(directory_path: str) -> tp.List[str]:
+    """
+    Return all .c files found in given directory.
+
+    :param directory_path: directory to look through
+    :return: .c files found
+    """
+    return find_files(directory_path, r'(.*)\.c', scan_subdirectories=True)
+
+
+def find_pyx_and_c(directory_path: str) -> tp.List[str]:
+    """
+    Return a list of all .pyx and .c files found in given directory.
+
+    :param directory_path:
+    :return: list of all .pyx and .c files found in given directory
+    """
+    files = find_pyx(directory_path)
+    files.extend(find_c(directory_path))
+    return files
 
 
 def read_requirements_txt(path: str = 'requirements.txt'):

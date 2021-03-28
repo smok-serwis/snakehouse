@@ -5,6 +5,7 @@
 build
 */build
 */dist
+docs/_build
 dist
 .eggs
 *.c

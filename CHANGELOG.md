@@ -1,6 +1,7 @@
-# v1.3.3
+# v1.4
 
-* _TBA_
+* added `find_pyx`, `find_c` and `find_pyx_and_c`
+* added documentation
 
 # v1.3.2
 
