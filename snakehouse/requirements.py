@@ -11,7 +11,7 @@ def find_pyx(directory_path: str) -> tp.List[str]:
     :param directory_path: directory to look through
     :return: .pyx files found
     """
-    return find_files(directory_path, r'(.*)\.pyx', scan_subdirectories=True)
+    return find_files(directory_path, '(.*)\\.pyx$', scan_subdirectories=True)
 
 
 @for_argument(returns=list)
@@ -22,7 +22,7 @@ def find_c(directory_path: str) -> tp.List[str]:
     :param directory_path: directory to look through
     :return: .c files found
     """
-    return find_files(directory_path, r'(.*)\.c', scan_subdirectories=True)
+    return find_files(directory_path, '(.*)\\.c$', scan_subdirectories=True)
 
 
 def find_pyx_and_c(directory_path: str) -> tp.List[str]:
