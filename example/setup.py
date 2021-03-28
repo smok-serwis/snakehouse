@@ -2,7 +2,7 @@ import os
 
 from setuptools import setup
 
-from snakehouse import Multibuild, build, monkey_patch_parallel_compilation
+from snakehouse import Multibuild, build, monkey_patch_parallel_compilation, find_pyx_and_c
 from setuptools import Extension
 
 monkey_patch_parallel_compilation()
@@ -18,10 +18,7 @@ if 'DEBUG' in os.environ:
 cython_multibuilds = [
         # note that Windows-style pathes are supported on Linux build environment,
         # the reverse not necessarily being true (issue #5)
-    Multibuild('example_module', ['example_module/test.pyx', 'example_module/test2.pyx',
-                                  'example_module/test3/test3.pyx',
-                                  'example_module/test3/test2.pyx',
-                                  'example_module/test_n.c'],
+    Multibuild('example_module', find_pyx_and_c('example_module'),
                define_macros=[("CYTHON_TRACE_NOGIL", "1")],
                dont_snakehouse=dont_snakehouse),
     Extension('example2.example', ['example2/example.pyx']),
