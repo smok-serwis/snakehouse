@@ -13,19 +13,14 @@ snakehouse
 snakehouse is a tool to pack mutiple .pyx files
 into a single extension.
 
-_There's a **MANDATORY READING** part at the end of this README. Read it or you will be sure to run into trouble._
-
 Inspired by [this StackOverflow discussion](https://stackoverflow.com/questions/30157363/collapse-multiple-submodules-to-one-cython-extension).
 
 Tested and works on CPython 3.5-3.9, 
 both Windows and [Linux](https://travis-ci.org/github/smok-serwis/snakehouse).
 It doesn't work on PyPy.
 
-Contributions most welcome! If you contribute, feel free to attach
-a change to [CONTRIBUTORS.md](/CONTRIBUTORS.md) as 
-a part of your pull request as well!
-Note what have you changed in
-[CHANGELOG.md](/CHANGELOG.md) as well!
+READ BEFORE YOU USE
+===================
 
-Usage notes - MANDATORY READING
--------------------------------
+Be sure to read the [docs](http://snakehouse.readthedocs.io/en/latest/) 
+before you start using it.
