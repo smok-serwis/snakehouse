@@ -21,8 +21,9 @@ project = 'snakehouse'
 copyright = '2020-2021 SMOK sp. z o. o.'
 author = 'Piotr Maślanka'
 
+from snakehouse import __version__
 # The full version, including alpha/beta/rc tags
-release = '1.4'
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------

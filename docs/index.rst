@@ -6,6 +6,7 @@ Welcome to snakehouse's documentation!
    :caption: Contents:
 
    usage
+   utilities
    accelerating
 
 
