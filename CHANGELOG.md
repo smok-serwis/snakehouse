@@ -1,6 +1,6 @@
 # v1.5
 
-* _TBA_
+* fixed logging
 
 # v1.4
 

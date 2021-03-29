@@ -60,13 +60,13 @@ class Multibuild:
                  dont_snakehouse: bool = False,
                  **kwargs):
         # sanitize path separators so that Linux-style paths are supported on Windows
+        logger.warning('Building extension %s with files %s', extension_name, files)
         files = list(files)
         self.dont_snakehouse = dont_snakehouse
         self.kwargs = kwargs
         if files:
             files = [os.path.join(*split(file)) for file in files]
             self.files = list([file for file in files if not file.endswith('__bootstrap__.pyx')])
-            logger.warning(str(self.files))
             self.pyx_files = [file for file in self.files if file.endswith('.pyx')]
             self.c_files = [file for file in self.files if file.endswith('.c') or file.endswith('.cpp')]
         else:
@@ -93,7 +93,6 @@ class Multibuild:
     def generate_header_files(self):
         for filename in self.pyx_files:
             path, name, cmod_name_path, module_name, coded_module_name, complete_module_name = self.transform_module_name(filename)
-            logger.warning('Generating header file for %s' % (filename, ))
             if not name.endswith('.pyx'):
                 continue
 

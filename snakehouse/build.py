@@ -30,5 +30,4 @@ def build(extensions: tp.List[MultiBuildType], *args, nthreads=None, **kwargs):
     values = cythonize(returns, *args, **kwargs)
     for multi_build in multi_builds:
         multi_build.do_after_cython()
-        logger.warning(multi_build.module_name_to_loader_function)
     return values
