@@ -13,8 +13,9 @@ jobs:
       - python/save-cache
       - run:
           command: |
-            pip install -r requirements.txt
-          name: Install necessary modules
+            sudo pip install -r requirements.txt
+            sudo python setup.py install
+          name: Install snakehouse
       - run:
           command: |
             cd example
