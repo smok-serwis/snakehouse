@@ -31,8 +31,8 @@ Do it via
 
 All dependencies will be installed automatically.
 
-Mandatory reading
-=================
+Mandatory reading and limitations
+=================================
 
 Take a look at example_ on how to multi-build your Cython extensions.
 
@@ -40,6 +40,17 @@ Take a look at example_ on how to multi-build your Cython extensions.
 
 Don't place modules compiled that way in root .py file's top level imports.
 Wrap them in a layer of indirection instead!
+
+So if your module is called :code:`example`, make a :code:`start_example/__main__.py` with
+the following code:
+
+.. code-block:: python
+
+    if __name__ == '__main__':
+        from example import run
+        run()
+
+Or however you do start your application.
 
 This applies to unit tests as well!
 
