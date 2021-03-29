@@ -1,10 +1,9 @@
 from setuptools import setup, find_packages
 
-from snakehouse import __version__
 
 setup(keywords=['cython', 'extension', 'multiple', 'pyx'],
       packages=find_packages(include=['snakehouse']),
-      version=__version__,
+      version='1.5a4',
       install_requires=[
             'Cython', 'mako', 'satella>=2.14.46',
       ],

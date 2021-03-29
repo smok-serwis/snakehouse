@@ -1,6 +1,7 @@
 # v1.5
 
 * fixed logging
+* `snakehouse` doesn't need cython and satella installed in advance
 
 # v1.4
 

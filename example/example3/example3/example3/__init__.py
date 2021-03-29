@@ -1,3 +1,0 @@
-from example3.example3.example3.__bootstrap__ import bootstrap_cython_submodules
-bootstrap_cython_submodules()
-

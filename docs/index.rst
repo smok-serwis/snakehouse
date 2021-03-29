@@ -20,6 +20,17 @@ were just plain :code:`.py` files.
 
 .. _Snakehouse: https://github.com/smok-serwis/snakehouse
 
+How do I install it?
+--------------------
+
+Do it via
+
+.. code-block:: bash
+
+    pip install snakehouse
+
+All dependencies will be installed automatically.
+
 Mandatory reading
 =================
 
