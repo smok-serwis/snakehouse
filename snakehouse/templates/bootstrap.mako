@@ -39,9 +39,6 @@ cdef class CythonPackageLoader:
     def load_module(self, fullname):
         raise ImportError
 
-    def get_code():
-        return None
-
     def create_module(self, spec):
         if spec.name != self.name:
             raise ImportError()

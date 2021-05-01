@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(keywords=['cython', 'extension', 'multiple', 'pyx'],
       packages=find_packages(include=['snakehouse']),
-      version='1.5a6',
+      version='1.5a7',
       install_requires=[
             'Cython', 'mako', 'satella>=2.14.46',
       ],

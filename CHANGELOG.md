@@ -2,7 +2,6 @@
 
 * fixed logging
 * `snakehouse` doesn't need cython and satella installed in advance
-* added `get_code` to `PackageLoader`
 
 # v1.4
 
