@@ -39,7 +39,7 @@ cdef class CythonPackageLoader:
     def load_module(self, fullname):
         raise ImportError
 
-    def get_code(fullname):
+    def get_code():
         return None
 
     def create_module(self, spec):
