@@ -18,7 +18,8 @@ Inspired by [this StackOverflow discussion](https://stackoverflow.com/questions/
 Tested and works on CPython 3.5-3.9, 
 both Windows and [Linux](https://travis-ci.org/github/smok-serwis/snakehouse).
 
-Contrary to what's said on PyPI it also works on PyPy!
+It doesn't work on PyPy due to lack of
+`PyModule_FromDefAndSpec` symbol.
 
 READ BEFORE YOU USE
 ===================
