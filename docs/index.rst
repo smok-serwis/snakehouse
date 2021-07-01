@@ -7,6 +7,7 @@ Welcome to snakehouse's documentation!
 
    usage
    utilities
+   coverage
    accelerating
 
 What is snakehouse?

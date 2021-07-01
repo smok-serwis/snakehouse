@@ -1,4 +1,5 @@
 import hashlib
+import itertools
 import os
 import logging
 import collections
@@ -6,7 +7,7 @@ import typing as tp
 import warnings
 
 import pkg_resources
-from satella.files import split
+from satella.files import split, find_files
 from mako.template import Template
 from setuptools import Extension
 
@@ -42,6 +43,27 @@ def render_mako(template_name: str, **kwargs) -> str:
 
 
 LINES_IN_HFILE = len(load_mako_lines('hfile.mako').split('\n'))
+
+
+class find_all:
+    """
+    A directive for :class:`snakehouse.Multibuild` to locate all .pyx
+    files, and possibly all the .c files depending on the switch
+
+    :param dir: base directory to look for files in
+    :param include_c_files: whether to also hook up the located .c files
+    """
+
+    def __init__(self, dir: str, include_c_files: bool = False):
+        self.dir = dir
+        self.include_c_files = include_c_files
+
+    def __iter__(self):
+        pyx_files = find_files(self.dir, r'(.*)\.pyx', scan_subdirectories=True)
+        c_files = find_files(self.dir, r'(.*)\.c', scan_subdirectories=True)
+        if self.include_c_files:
+            pyx_files = itertools.chain(pyx_files, c_files)
+        return pyx_files
 
 
 class Multibuild:
