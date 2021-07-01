@@ -1,4 +1,6 @@
 import typing as tp
+import warnings
+
 from satella.coding import for_argument
 from satella.files import read_lines, find_files
 
@@ -11,6 +13,7 @@ def find_pyx(directory_path: str) -> tp.List[str]:
     :param directory_path: directory to look through
     :return: .pyx files found
     """
+    warnings.warn('This is deprecated. Use find_all instead', DeprecationWarning)
     return find_files(directory_path, '(.*)\\.pyx$', scan_subdirectories=True)
 
 
@@ -32,6 +35,7 @@ def find_pyx_and_c(directory_path: str) -> tp.List[str]:
     :param directory_path:
     :return: list of all .pyx and .c files found in given directory
     """
+    warnings.warn('This is deprecated. Use find_all instead', DeprecationWarning)
     files = find_pyx(directory_path)
     files.extend(find_c(directory_path))
     return files
