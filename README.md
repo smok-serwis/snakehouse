@@ -17,10 +17,8 @@ Inspired by [this StackOverflow discussion](https://stackoverflow.com/questions/
 
 Tested and works on CPython 3.5-3.9, 
 both Windows and [Linux](https://travis-ci.org/github/smok-serwis/snakehouse).
-Somehow, it seems to pass unit tests on PyPy, so I enabled
-installation at PyPy, but I would seem to be vary of that.
-Please report your results by raising an 
-[issue](https://github.com/smok-serwis/snakehouse/issues).
+
+Contrary to what's said on PyPI it also works on PyPy!
 
 READ BEFORE YOU USE
 ===================
