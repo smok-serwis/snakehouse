@@ -1,7 +1,8 @@
 language: python
 stages:
   - name: test
-
+  - name: deploy
+    if: tag is present
 cache: pip
 before_script:
   - python setup.py install
@@ -18,3 +19,10 @@ jobs:
       python: "3.9"
     - stage: test
       python: "pypy3.5"
+    - stage: deploy
+      python: "3.8"
+      script:
+        - pip install wheel twine
+        - python setup.py bdist bdist_wheel
+        - twine upload -u $PYPI_USER -p $PYPI_PWD dist/*
+
