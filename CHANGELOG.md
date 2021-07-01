@@ -2,6 +2,8 @@
 
 * fixed logging
 * `snakehouse` doesn't need cython and satella installed in advance
+* added `find_all`
+* made available for PyPy users
 
 # v1.4
 
