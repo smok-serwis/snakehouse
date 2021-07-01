@@ -50,19 +50,26 @@ class find_all:
     A directive for :class:`snakehouse.Multibuild` to locate all .pyx
     files, and possibly all the .c files depending on the switch
 
-    :param dir: base directory to look for files in
-    :param include_c_files: whether to also hook up the located .c files
+    :param directory: base directory to look for files in
+    :param include_c_files: whether to also hook up the located .c files (default False)
+    :param only_c_files: whether to look up only .c files (default False)
     """
 
-    def __init__(self, dir: str, include_c_files: bool = False):
-        self.dir = dir
+    def __init__(self, directory: str, include_c_files: bool = False,
+                 only_c_files: bool = False):
+        self.dir = directory
         self.include_c_files = include_c_files
+        self.only_c_files = only_c_files
 
     def __iter__(self):
-        pyx_files = find_files(self.dir, r'(.*)\.pyx', scan_subdirectories=True)
-        c_files = find_files(self.dir, r'(.*)\.c', scan_subdirectories=True)
+        if self.only_c_files:
+            pyx_files = []
+        else:
+            pyx_files = find_files(self.dir, r'(.*)\.pyx', scan_subdirectories=True)
+
         if self.include_c_files:
-            pyx_files = itertools.chain(pyx_files, c_files)
+            pyx_files = itertools.chain(pyx_files,
+                                        find_files(self.dir, r'(.*)\.c', scan_subdirectories=True))
         return pyx_files
 
 

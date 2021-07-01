@@ -4,7 +4,7 @@
 * `snakehouse` doesn't need cython and satella installed in advance
 * added `find_all`
 * made available for PyPy users
-* deprecated `find_pyx` and `find_pyx_and_c`
+* deprecated `find_pyx`, `find_c` and `find_pyx_and_c`
 
 # v1.4
 

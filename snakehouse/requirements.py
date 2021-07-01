@@ -25,6 +25,7 @@ def find_c(directory_path: str) -> tp.List[str]:
     :param directory_path: directory to look through
     :return: .c files found
     """
+    warnings.warn('This is deprecated. Use find_all instead', DeprecationWarning)
     return find_files(directory_path, '(.*)\\.c$', scan_subdirectories=True)
 
 
